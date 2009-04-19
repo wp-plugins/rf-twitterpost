@@ -53,7 +53,7 @@ if (!class_exists("RF_TwitterPost")) {
 			// Set default values for the options
 			$adminTwitterUser 		= "";
 			$adminTwitterPass 		= "";
-			$adminTweetFormat 		= "Bloggged %POSTTITLE%: - %URL%";
+			$adminTweetFormat 		= "Bloggged %TITLE%: - %URL%";
 			
 			$adminOptions = array(
 								$this->adminTwitterUser => $adminTwitterUser,
