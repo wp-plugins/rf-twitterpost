@@ -34,7 +34,6 @@ http://www.redfootwebdesign.com/projects/rf-twitterpost
 
 * 1.0.0 - Initial Release
 
-
 == Screenshots ==
 
 1. None at this time
