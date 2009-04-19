@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: TwitterPost
-Plugin URI: http://www.redfootwebdesign.com/projects/twitterpost/
+Plugin URI: http://www.redfootwebdesign.com/projects/rf-twitterpost
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte
 Version: 1.0.0
