@@ -12,7 +12,7 @@ Submits a tweet to twitter whenever you publish a new post.
 
 This plugin allows you to tweet whenever you publish a new post.
 You can customize the tweet message and include the title or url with tags %TITLE% or %URL% (respectively).
-Twitter only allows up to 140 characters in a single tweet. Because of this restriction, if the format + tags cannot be more than 140 characters.
+Twitter only allows up to 140 characters in a single tweet. Because of this restriction, the format + expanded tags cannot be more than 140 characters.
 If you include the %URL% tag, it is given priority. If it cannot fit into the format because your text is to long then it will be excluded entriley.
 If you include the %TITLE% tag and the post title causes the tweet to go over 140 characters, the plugin uses a substring of the post title, so it
 will fit in the tweet.
