@@ -1,4 +1,4 @@
-=== WP E-Cards ===
+=== RF Twitter Post ===
 Contributors: layotte
 Donate link: http://www.redfootwebdesign.com/projects/
 Tags: twitter, tweet, autopost, autotweet
