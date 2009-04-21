@@ -1,7 +1,7 @@
 === RF Twitter Post ===
 Contributors: layotte
 Donate link: http://www.redfootwebdesign.com/projects/
-Tags: twitter, tweet, autopost, autotweet
+Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl
 Requires at least: 2.6
 Tested up to: 2.7
 Stable tag: 1.0.0
