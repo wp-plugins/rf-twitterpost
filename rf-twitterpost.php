@@ -2,10 +2,10 @@
 
 /*
 Plugin Name: TwitterPost
-Plugin URI: http://fullthrottledevelopment.com/projects/rf-twitterpost
+Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.1.0
+Version: 1.1.1
 Author URI: http://fullthrottledevelopment.com/
 Tags: Twitter, Tweet, Status, AutoPost, AutoTweet, Share, Social Networking, Post, Publish
 */
@@ -18,7 +18,7 @@ if ($php_versoin >= 5) {
 	require_once "Twitter.class.php4";		# Felix Oghina
 }
 
-define( 'TwitterPost_Version' , '1.1.0' );
+define( 'TwitterPost_Version' , '1.1.1' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {

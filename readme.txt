@@ -1,6 +1,6 @@
 === RF Twitter Post ===
 Contributors: layotte
-Donate link: http://fullthrottledevelopment.com/projects
+Donate link: http://fullthrottledevelopment.com/contact
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl
 Requires at least: 2.6
 Tested up to: 2.8
