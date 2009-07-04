@@ -31,7 +31,7 @@ This section describes how to install the plugin and get it working.
 
 = Where can I find help or make suggestions? =
 
-http://fullthrottledevelopment.com/projects/rf-twitterpost
+http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
 
