@@ -2,12 +2,12 @@
 
 /*
 Plugin Name: TwitterPost
-Plugin URI: http://www.redfootwebdesign.com/projects/rf-twitterpost
+Plugin URI: http://fullthrottledevelopment.com/projects/rf-twitterpost
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
-Author: Lew Ayotte
-Version: 1.0.0
-Author URI: http://www.redfootwebdesign.com/
-Tags: Twitter, Tweet, Status, AutoPost, AutoTweet, Share, Social Networking
+Author: Lew Ayotte @ Full Throttle Development
+Version: 1.1.0
+Author URI: http://fullthrottledevelopment.com/
+Tags: Twitter, Tweet, Status, AutoPost, AutoTweet, Share, Social Networking, Post, Publish
 */
 
 $php_version = (int)phpversion();
@@ -18,7 +18,7 @@ if ($php_versoin >= 5) {
 	require_once "Twitter.class.php4";		# Felix Oghina
 }
 
-define( 'TwitterPost_Version' , '1.0.0' );
+define( 'TwitterPost_Version' , '1.1.0' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -36,7 +36,8 @@ if (!class_exists("RF_TwitterPost")) {
 
 		// Constructor
 		function RF_TwitterPost() {
-			
+			global $wp_version;
+			$this->wp_version = $wp_version;
 		}
 		
 		// Initialization function
@@ -53,7 +54,7 @@ if (!class_exists("RF_TwitterPost")) {
 			// Set default values for the options
 			$adminTwitterUser 		= "";
 			$adminTwitterPass 		= "";
-			$adminTweetFormat 		= "Bloggged %TITLE%: - %URL%";
+			$adminTweetFormat 		= "Blogged %TITLE%: - %URL%";
 			
 			$adminOptions = array(
 								$this->adminTwitterUser => $adminTwitterUser,
@@ -120,6 +121,77 @@ if (!class_exists("RF_TwitterPost")) {
 			</div>
 			<?php
 		}
+		
+		function twitterpost_meta_tags($id) {
+			$awmp_edit = $_POST["rftp_edit"];
+			
+			if (isset($awmp_edit) && !empty($awmp_edit)) {
+				$tweet = $_POST["rftp_tweet"];
+	
+				delete_post_meta($id, 'rftp_tweet');
+				
+				if (isset($tweet) && !empty($tweet)) {
+					add_post_meta($id, 'rftp_tweet', $tweet);
+				}
+			}
+		}
+		
+		function twitterpost_add_meta_tags() {
+			global $post;
+			$post_id = $post;
+			
+			if (is_object($post_id)) {
+				$post_id = $post_id->ID;
+			}
+			
+			$tweet = htmlspecialchars(stripcslashes(get_post_meta($post_id, 'rftp_tweet', true))); ?>
+	
+			<?php if (substr($this->wp_version, 0, 3) >= '2.5') { ?>
+                    <div id="postrftp" class="postbox">
+                    <h3><?php _e('Twitter Post', 'twitter_post') ?></h3>
+                    <div class="inside">
+                    <div id="postrftp">
+			<?php } else { ?>
+                    <div class="dbx-b-ox-wrapper">
+                    <fieldset id="rtfpdiv" class="dbx-box">
+                    <div class="dbx-h-andle-wrapper">
+                    <h3 class="dbx-handle"><?php _e('RF Twitter Post', 'twitter_post') ?></h3>
+                    </div>
+                    <div class="dbx-c-ontent-wrapper">
+                    <div class="dbx-content">
+			<?php } ?>
+		
+			<a target="__blank" href="http://fullthrottledevelopment.com/projects/rf-twitterpost/"><?php _e('RF Twitter Post', 'twitter_post') ?></a>
+			<input value="rftp_edit" type="hidden" name="rftp_edit" />
+			<table style="margin-bottom:40px">
+                <tr>
+                <th style="text-align:left;" colspan="2">
+                </th>
+                </tr>
+                <tr>
+                <th scope="row" style="text-align:right; width:150px;"><?php _e('Tweet Format:', 'twitter_post') ?></th>
+                <td><input value="<?php echo $tweet ?>" type="text" name="rftp_tweet" maxlength="140" size="100"/></td></tr>
+                <tr>
+                <th scope="row" style="text-align:right; width:150px; vertical-align:top;">Format Options:</th>
+                <td style="vertical-align:top;">
+                	<ul>
+                        <li>%TITLE% - Displays Title of your post in your Twitter feed.*</li>
+                        <li>%URL% - Displays TinyURL of your post in your Twitter feed.*</li>
+                    </ul>
+                    <p>*NOTE: Twitter currently only allows 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p></td>
+            	</tr>
+			</table>
+			
+			<?php if (substr($this->wp_version, 0, 3) >= '2.5') { ?>
+			</div></div></div>
+			<?php } else { ?>
+			</div>
+			</fieldset>
+			</div>
+			<?php } ?>
+	
+			<?php
+		}
 	}
 }
 
@@ -132,11 +204,17 @@ if (class_exists("RF_TwitterPost")) {
 if (!function_exists("RF_TwitterPost_ap")) {
 	function RF_TwitterPost_ap() {
 		global $dl_pluginRFTwitterPost;
+		
 		if (!isset($dl_pluginRFTwitterPost)) {
 			return;
 		}
+		
 		if (function_exists('add_options_page')) {
 			add_options_page('Twitter Post Options', 'Twitter Post Options', 9, basename(__FILE__), array(&$dl_pluginRFTwitterPost, 'printAdminPage'));
+		}
+		
+		if (function_exists('add_option')) {
+			add_option('rftp_tweet', '', 'Twitter Post Meta Tags', 'yes');
 		}
 	}	
 }
@@ -155,7 +233,11 @@ if (!function_exists("publish_to_twitter")) {
 		$options = get_option('rf_twitterpost');		
 		$twitter = new Twitter($options['rf_twitteruser'], $options['rf_twitterpass']);
 		
-		$tweet = $options['rf_tweetformat'];
+		$tweet = htmlspecialchars(stripcslashes(get_post_meta($postID, 'rftp_tweet', true)));
+		
+		if (!isset($tweet) || empty($tweet)) {
+			$tweet = $options['rf_tweetformat'];
+		}
 		
 		$tweetLen = strlen($tweet);
 		
@@ -232,8 +314,25 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('admin_menu', 'RF_TwitterPost_ap');
 	// Initialize options on plugin activation
 	add_action("activate_rf-twitterpost/rf-twitterpost.php",  array(&$dl_pluginRFTwitterPost, 'init'));
+	
+	if (substr($dl_pluginRFTwitterPost->wp_version, 0, 3) >= '2.5') {
+		add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
+		add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
+	} else {
+		add_action('dbx_post_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
+		add_action('dbx_page_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
+	}
+	
+	add_action('edit_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	add_action('publish_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	add_action('save_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	
 	// Whenever you publish a post, post to twitter
-	add_action('publish_post', 'publish_to_twitter');
+	// add_action('publish_post', 'publish_to_twitter');	# publishing to twitter, even when a published post is edited and saved
+	add_action('future_to_publish', 'publish_to_twitter');
+	add_action('new_to_publish', 'publish_to_twitter');
+	add_action('draft_to_publish', 'publish_to_twitter');
 }
 
 ?>
