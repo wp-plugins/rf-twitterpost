@@ -4,7 +4,7 @@ Donate link: http://fullthrottledevelopment.com/contact
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl
 Requires at least: 2.6
 Tested up to: 2.8
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
@@ -35,12 +35,14 @@ http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
 
-* 1.1.0 - Fixed Default Tweet typo ("blogged" instead of "bloggged").
-		- No longer publishes to twitter when you update/edit an old post.
-		- Added feature to customize tweet per post using Custom Fields.
-		- Changed project URL to http://fullthrottledevelopment.com/ - my new business venture.
+= 1.1.0 =
+* Fixed Default Tweet typo ("blogged" instead of "bloggged").
+* No longer publishes to twitter when you update/edit an old post.
+* Added feature to customize tweet per post using Custom Fields.
+* Changed project URL to http://fullthrottledevelopment.com/ - my new business venture.
 
-* 1.0.0 - Initial Release
+= 1.0.0 =
+* Initial Release
 
 == Screenshots ==
 
