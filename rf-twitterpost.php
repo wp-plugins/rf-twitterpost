@@ -161,7 +161,7 @@ if (!class_exists("RF_TwitterPost")) {
                     <div class="dbx-content">
 			<?php } ?>
 		
-			<a target="__blank" href="http://fullthrottledevelopment.com/projects/rf-twitterpost/"><?php _e('RF Twitter Post', 'twitter_post') ?></a>
+			<a target="__blank" href="http://fullthrottledevelopment.com/twitter-post"><?php _e('RF Twitter Post', 'twitter_post') ?></a>
 			<input value="rftp_edit" type="hidden" name="rftp_edit" />
 			<table style="margin-bottom:40px">
                 <tr>
