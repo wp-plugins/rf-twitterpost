@@ -35,6 +35,9 @@ http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
 
+= 1.1.1 =
+* Fixed support URLs.
+
 = 1.1.0 =
 * Fixed Default Tweet typo ("blogged" instead of "bloggged").
 * No longer publishes to twitter when you update/edit an old post.
