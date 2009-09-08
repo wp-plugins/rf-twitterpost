@@ -1,14 +1,18 @@
 === RF Twitter Post ===
 Contributors: layotte
 Donate link: http://fullthrottledevelopment.com/contact
-Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl
+Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 Requires at least: 2.6
 Tested up to: 2.8
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
 == Description ==
+=NEW=
+Multiple Authors of your blog can have their own Twitter information setup under the User's section. So whenever they post it will send a tweet. It will also still send a tweet from the main Twitter account.
+You can choose which categories are included or excluded.
+You can now select individal posts not to be tweeted before you publish them.
 
 This plugin allows you to tweet whenever you publish a new post.
 You can customize the tweet message and include the title or url with tags %TITLE% or %URL% (respectively).
@@ -34,6 +38,14 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+
+= 1.2.0 =
+* Changed default tweet from "Blogged %TITLE%: - %URL%" to "Blogged %TITLE%: %URL%".
+* Added check to make sure PHP Curl is installed.
+* Fixed bug that caused Twitter Post to tweet when adding new page.
+* Added ability to specify which categories to include/exclude in tweet.
+* Added ability to exclude a post before publishing it.
+* Added support for multiple author twitter accounts and default twitter account.
 
 = 1.1.1 =
 * Fixed support URLs.
