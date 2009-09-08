@@ -45,6 +45,7 @@ http://fullthrottledevelopment.com/twitter-post
 * Fixed bug that caused Twitter Post to tweet when adding new page.
 * Added ability to specify which categories to include/exclude in tweet.
 * Added ability to exclude a post before publishing it.
+* Added support for using the Twitter Friendly Links URL instead of TinyURL if activated
 * Added support for multiple author twitter accounts and default twitter account.
 
 = 1.1.1 =
