@@ -5,7 +5,7 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.2.0
+Version: 1.2.1
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
@@ -18,7 +18,7 @@ if ($php_versoin >= 5) {
 	require_once "Twitter.class.php4";		# Felix Oghina
 }
 
-define( 'TwitterPost_Version' , '1.2.0' );
+define( 'TwitterPost_Version' , '1.2.1' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -34,6 +34,7 @@ if (!class_exists("RF_TwitterPost")) {
 		var $adminTwitterPass			= "rf_twitterpass";
 		var $adminTweetFormat			= "rf_tweetformat";
 		var $adminTweetCats				= "rf_tweetcats";
+		var $adminTweetAllUsers			= "rf_tweetallusers";
 		
 		var $userOptionsName			= "rf_twitterpost";
 		var $userTwitterUser			= "rf_twitteruser";
@@ -60,7 +61,6 @@ if (!class_exists("RF_TwitterPost")) {
 					$this->getAdminOptions();
 				}
 			}
-
 		}
 		
 		/*--------------------------------------------------------------------
@@ -78,7 +78,8 @@ if (!class_exists("RF_TwitterPost")) {
 								 $this->adminTwitterUser 		=> $adminTwitterUser,
 								 $this->adminTwitterPass 		=> $adminTwitterPass,
 								 $this->adminTweetFormat 		=> $adminTweetFormat,
-								 $this->adminTweetCategories 	=> $adminTweetCats
+								 $this->adminTweetCategories 	=> $adminTweetCats,
+								 $this->adminTweetAllUsers		=> $adminTweetAllUsers
 								 );
 			
 			// Get values from the WP options table in the database, re-assign if found
@@ -143,6 +144,8 @@ if (!class_exists("RF_TwitterPost")) {
 					$adminOptions[$this->adminTweetCats] = $_POST['rf_tweetcats'];
 				}
 				
+				$adminOptions[$this->adminTweetAllUsers] = $_POST['rf_tweetallusers'];
+				
 				update_option($this->adminOptionsName, $adminOptions);
 				// update settings notification below
 				?>
@@ -167,6 +170,10 @@ if (!class_exists("RF_TwitterPost")) {
                     <p>Tweet Categories: <input name="rf_tweetcats" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',$adminOptions[$this->adminTweetCats]), 'RF_TwitterPost') ?>" /></p>
                     <div class="tweet-cats" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">Display posts from several specific category IDs, e.g. 3,4,5<br />Display all posts except those from a category by prefixing its ID with a '-' (minus) sign, e.g. -3,-4,-5</p>
+                    </div>
+                    <p>Tweet All Authors? <input value="1" type="checkbox" name="rf_tweetallusers" <?php if ((int)$adminOptions[$this->adminTweetAllUsers] == 1) echo "checked"; ?> /></p>
+                    <div class="tweet-allusers" style="margin-left: 50px;">
+                    <p style="font-size: 11px; margin-bottom: 0px;">Check this box if you want Twitter Post to tweet to each available author account.</p>
                     </div>
                     <p style="font-size: 11px; margin-top: 50px;">*NOTE: Twitter currently only allows 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p>
 					
@@ -297,7 +304,7 @@ if (!class_exists("RF_TwitterPost")) {
                 
                 
                 <tr><th scope="row" style="text-align:right; width:150px; padding-top: 5px; padding-right:10px;"><?php _e('Exclude this Post:', 'twitter_post') ?></th>
-                <td><input value="1" type="checkbox" name="rftp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> /> <?php echo "Value = " . $exclude; ?></td></tr>
+                <td><input value="1" type="checkbox" name="rftp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> /></td></tr>
                 <tr>
                 
                 <th scope="row" style="text-align:right; width:150px; vertical-align:top; padding-top: 5px; padding-right:10px;">Format Options:</th>
@@ -437,81 +444,91 @@ if (!function_exists("publish_to_twitter")) {
 				}
 			}
 			
-			$userOptions = get_option('rf_twitterpost_' . $current_user->user_login);
-			if(!empty($userOptions)) {
-				$userTwitter = new Twitter($userOptions['rf_twitteruser'], $userOptions['rf_twitterpass']);
+			$user_ids[] = $current_user->ID;
+			
+			if ($adminOptions['rf_tweetallusers']) {
+				$user_ids = get_author_user_ids();
+			}
+			
+			foreach ($user_ids as $user_id) {
+				$curauth = get_userdata($user_id);
 				
-				$exclude = get_post_meta($postID, 'rftp_exclude', true);
-				if ($exclude == 1) return;
-				
-				$continue = FALSE;
-				if (!empty($userOptions['rf_tweetcats'])) {
-					$cats = split(",", $userOptions['rf_tweetcats']);
-					foreach ($cats as $cat) {
-						if (preg_match('/^-\d+/', $cat)) {
-							$cat = preg_replace('/^-/', '', $cat);
-							if (in_category( (int)$cat, $post )) {
-								return; // if in an exluded category, return.
-							}
-						} else if (preg_match('/\d+/', $cat)) {
-							if (in_category( (int)$cat, $post )) {
-								$continue = TRUE; // if  in an included category, set continue = TRUE.
+				$userOptions = get_option('rf_twitterpost_' . $curauth->user_login);
+				if(!empty($userOptions)) {
+					$userTwitter = new Twitter($userOptions['rf_twitteruser'], $userOptions['rf_twitterpass']);
+					
+					$exclude = get_post_meta($postID, 'rftp_exclude', true);
+					if ($exclude == 1) return;
+					
+					$continue = FALSE;
+					if (!empty($userOptions['rf_tweetcats'])) {
+						$cats = split(",", $userOptions['rf_tweetcats']);
+						foreach ($cats as $cat) {
+							if (preg_match('/^-\d+/', $cat)) {
+								$cat = preg_replace('/^-/', '', $cat);
+								if (in_category( (int)$cat, $post )) {
+									return; // if in an exluded category, return.
+								}
+							} else if (preg_match('/\d+/', $cat)) {
+								if (in_category( (int)$cat, $post )) {
+									$continue = TRUE; // if  in an included category, set continue = TRUE.
+								}
 							}
 						}
-					}
-				} else { // If no includes or excludes are defined, then continue
-					$continue = TRUE;
-				}
-				
-				if (!$continue) return; // if not in an included category, return.
-				
-				$tweet = htmlspecialchars(stripcslashes(get_post_meta($postID, 'rftp_tweet', true)));
-				
-				if (!isset($tweet) || empty($tweet)) {
-					$tweet = $userOptions['rf_tweetformat'];
-				}
-				
-				$tweetLen = strlen($tweet);
-				
-				if (preg_match('%URL%', $tweet)) {
-					$plugins = get_option('active_plugins');
-					$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
-					//check to see if Twitter Friendly Links plugin is activated			
-					if ( in_array( $required_plugin , $plugins ) ) {
-						$url = permalink_to_twitter_link(get_permalink($postID)); // if yes, we want to use that for our URL shortening service.
-					} else {
-						$url = getTinyURL(get_permalink($postID)); //else use TinyURL's URL shortening service.
+					} else { // If no includes or excludes are defined, then continue
+						$continue = TRUE;
 					}
 					
-					$urlLen = strlen($url);
-					$totalLen = $urlLen + $tweetLen - 5; // subtract 5 for "%URL%".
+					if (!$continue) return; // if not in an included category, return.
 					
-					if ($totalLen <= $maxLen) {
-						$tweet = str_ireplace("%URL%", $url, $tweet);
-					} else {
-						$tweet = str_ireplace("%URL%", "", $tweet); // Too Long (need to get rid of URL).
-					}
-				}
-				
-				$tweetLen = strlen($tweet);
-				
-				if (preg_match('%TITLE%', $tweet)) {
-					$title = $post->post_title;
-				
-					$titleLen = strlen($title); 
-					$totalLen = $titleLen + $tweetLen - 7;	// subtract 7 for "%TITLE%".
+					$tweet = htmlspecialchars(stripcslashes(get_post_meta($postID, 'rftp_tweet', true)));
 					
-					if ($totalLen <= $maxLen) {
-						$tweet = str_ireplace("%TITLE%", $title, $tweet);
-					} else {
-						$diff = $maxLen - $totalLen;  // reversed because I need a negative number
-						$newTitle = substr($title, 0, $diff - 4); // subtract 1 for 0 based array and 3 more for adding an ellipsis
-						$tweet = str_ireplace("%TITLE%", $newTitle . "...", $tweet);
+					if (!isset($tweet) || empty($tweet)) {
+						$tweet = $userOptions['rf_tweetformat'];
 					}
-				}
-				
-				if (strlen($tweet) <= 140) {
-					$userTwitter->update($tweet);
+					
+					$tweetLen = strlen($tweet);
+					
+					if (preg_match('%URL%', $tweet)) {
+						$plugins = get_option('active_plugins');
+						$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
+						//check to see if Twitter Friendly Links plugin is activated			
+						if ( in_array( $required_plugin , $plugins ) ) {
+							$url = permalink_to_twitter_link(get_permalink($postID)); // if yes, we want to use that for our URL shortening service.
+						} else {
+							$url = getTinyURL(get_permalink($postID)); //else use TinyURL's URL shortening service.
+						}
+						
+						$urlLen = strlen($url);
+						$totalLen = $urlLen + $tweetLen - 5; // subtract 5 for "%URL%".
+						
+						if ($totalLen <= $maxLen) {
+							$tweet = str_ireplace("%URL%", $url, $tweet);
+						} else {
+							$tweet = str_ireplace("%URL%", "", $tweet); // Too Long (need to get rid of URL).
+						}
+					}
+					
+					$tweetLen = strlen($tweet);
+					
+					if (preg_match('%TITLE%', $tweet)) {
+						$title = $post->post_title;
+					
+						$titleLen = strlen($title); 
+						$totalLen = $titleLen + $tweetLen - 7;	// subtract 7 for "%TITLE%".
+						
+						if ($totalLen <= $maxLen) {
+							$tweet = str_ireplace("%TITLE%", $title, $tweet);
+						} else {
+							$diff = $maxLen - $totalLen;  // reversed because I need a negative number
+							$newTitle = substr($title, 0, $diff - 4); // subtract 1 for 0 based array and 3 more for adding an ellipsis
+							$tweet = str_ireplace("%TITLE%", $newTitle . "...", $tweet);
+						}
+					}
+					
+					if (strlen($tweet) <= 140) {
+						$userTwitter->update($tweet);
+					}
 				}
 			}
 		}
