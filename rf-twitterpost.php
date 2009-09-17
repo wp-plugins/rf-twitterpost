@@ -49,12 +49,18 @@ if (!class_exists("RF_TwitterPost")) {
 		
 		// Initialization function
 		function init() {
-			if (!function_exists("curl_init")) {
-				deactivate_plugins(__FILE__);
-				die("This plugin needs <a href=\"http://www.php.net/curl\"></a> to be installed on your server in order to run properly.");
-			} else {	
-				$this->getAdminOptions();
+			$plugins = get_option('active_plugins');
+			$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
+			//check to see if Twitter Friendly Links plugin is activated			
+			if ( in_array( $required_plugin , $plugins ) ) {
+				if (!function_exists("curl_init")) {
+					deactivate_plugins(__FILE__);
+					die("This plugin needs either <a href=\"http://www.php.net/curl\">PHP cURL</a> to be installed on your server or <a href\"http://wordpress.org/extend/plugins/twitter-friendly-links/\">Twitter Friendly Links Plugin</a> activated in Wordpress.");
+				} else {	
+					$this->getAdminOptions();
+				}
 			}
+
 		}
 		
 		/*--------------------------------------------------------------------
