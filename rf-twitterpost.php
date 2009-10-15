@@ -379,14 +379,12 @@ if (!function_exists("publish_to_twitter")) {
 					foreach ($cats as $cat) {
 						if (preg_match('/^-\d+/', $cat)) {
 							$cat = preg_replace('/^-/', '', $cat);
-							if (in_category( (int)$cat, $post )) {
-								return; // if in an excluded category, return.
-							} else {
-								$continue = TRUE;
+							if (!in_category( (int)$cat, $post )) {
+								$continue = TRUE; // if not in an excluded category, set continue = TRUE.
 							}
 						} else if (preg_match('/\d+/', $cat)) {
 							if (in_category( (int)$cat, $post )) {
-								$continue = TRUE; // if  in an included category, set continue = TRUE.
+								$continue = TRUE; // if in an included category, set continue = TRUE.
 							}
 						}
 					}
