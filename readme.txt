@@ -41,7 +41,7 @@ http://fullthrottledevelopment.com/twitter-post
 == Release History ==
 
 = 1.3.1 =
-* Fixed bug wit category exclusion logic... accidentally brought it back in with version 1.3.0
+* Fixed bug with category exclusion logic... accidentally brought it back in with version 1.3.0
 
 = 1.3.0 =
 * Cleaned up and remove 139 lines of code
