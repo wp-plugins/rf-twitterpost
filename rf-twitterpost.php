@@ -4,7 +4,7 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.3.0
+Version: 1.3.1
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
@@ -326,6 +326,8 @@ if (!function_exists("publish_to_twitter")) {
 								$cat = preg_replace('/^-/', '', $cat);
 								if (in_category( (int)$cat, $post )) {
 									return; // if in an exluded category, return.
+								} else  {
+									$continue = TRUE; // if not, than we can continue -- thanks Webmaster HC at hablacentro.com :)
 								}
 							} else if (preg_match('/\d+/', $cat)) {
 								if (in_category( (int)$cat, $post )) {
