@@ -17,7 +17,7 @@ if ($php_versoin >= 5) {
 	require_once "Twitter.class.php4";		# Felix Oghina
 }
 
-define( 'TwitterPost_Version' , '1.3.0' );
+define( 'TwitterPost_Version' , '1.3.1' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
