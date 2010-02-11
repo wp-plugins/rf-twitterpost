@@ -4,7 +4,7 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.3.3
+Version: 1.3.4
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
@@ -17,7 +17,7 @@ if ($php_version >= 5) {
 	require_once "Twitter.class.php4";		# Felix Oghina
 }
 
-define( 'TwitterPost_Version' , '1.3.3' );
+define( 'TwitterPost_Version' , '1.3.4' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -288,8 +288,7 @@ if (!function_exists("publish_to_twitter")) {
 	    $post = get_post($postID);
 		$maxLen = 140;
 		
-		global $current_user;
-		get_currentuserinfo();
+		if (get_post_meta($postID, 'rftp_exclude', true) == 1) return;
 		
 		if ($post->post_type == 'post') {
 			$options = get_option('rf_twitterpost');
@@ -298,10 +297,11 @@ if (!function_exists("publish_to_twitter")) {
 				$user_ids = $wpdb->get_col($wpdb->prepare( "SELECT user_login 
 															FROM $wpdb->users" ));
 			} else {
-				$user_ids[] = $current_user->user_login;
+				$authorID = $post->post_author;
+				$user_ids[] = get_the_author_meta('user_login', $authorID);
 			}
 			
-			$user_ids[] = "";
+			$user_ids[] = ""; //adds admin user (no login name associated with admin user)
 			
 			foreach ($user_ids as $user_id) {
 				if (empty($user_id)) {
@@ -314,9 +314,6 @@ if (!function_exists("publish_to_twitter")) {
 				
 				if(!empty($options)) {
 					$twitter = new Twitter($options['rf_twitteruser'], $options['rf_twitterpass']);
-					
-					$exclude = get_post_meta($postID, 'rftp_exclude', true);
-					if ($exclude == 1) return;
 					
 					$continue = FALSE;
 					if (!empty($options['rf_tweetcats'])) {
