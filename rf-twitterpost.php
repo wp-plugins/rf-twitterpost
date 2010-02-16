@@ -4,7 +4,7 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.3.4
+Version: 1.3.5
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
@@ -17,7 +17,7 @@ if ($php_version >= 5) {
 	require_once "Twitter.class.php4";		# Felix Oghina
 }
 
-define( 'TwitterPost_Version' , '1.3.4' );
+define( 'TwitterPost_Version' , '1.3.5' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -290,6 +290,18 @@ if (!function_exists("publish_to_twitter")) {
 		
 		if (get_post_meta($postID, 'rftp_exclude', true) == 1) return;
 		
+		// I've made an assumption that most users will include the %URL% text
+		// So, instead of trying to get the link several times for multi-user setups
+		// I'm getting the URL once and using it later --- for the sake of efficiency
+		$plugins = get_option('active_plugins');
+		$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
+		//check to see if Twitter Friendly Links plugin is activated			
+		if ( in_array( $required_plugin , $plugins ) ) {
+			$url = permalink_to_twitter_link(get_permalink($postID)); // if yes, we want to use that for our URL shortening service.
+		} else {
+			$url = getTinyURL(get_permalink($postID)); //else use TinyURL's URL shortening service.
+		}
+		
 		if ($post->post_type == 'post') {
 			$options = get_option('rf_twitterpost');
 			
@@ -347,15 +359,6 @@ if (!function_exists("publish_to_twitter")) {
 					$tweetLen = strlen($tweet);
 					
 					if (preg_match('%URL%', $tweet)) {
-						$plugins = get_option('active_plugins');
-						$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
-						//check to see if Twitter Friendly Links plugin is activated			
-						if ( in_array( $required_plugin , $plugins ) ) {
-							$url = permalink_to_twitter_link(get_permalink($postID)); // if yes, we want to use that for our URL shortening service.
-						} else {
-							$url = getTinyURL(get_permalink($postID)); //else use TinyURL's URL shortening service.
-						}
-						
 						$urlLen = strlen($url);
 						$totalLen = $urlLen + $tweetLen - 5; // subtract 5 for "%URL%".
 						
