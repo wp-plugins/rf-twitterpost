@@ -4,20 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.3.5
+Version: 1.4.0
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
 
-$php_version = (int)phpversion();
-
-if ($php_version >= 5) {
-	require_once "Twitter.class.php";		# Felix Oghina
-} else {
-	require_once "Twitter.class.php4";		# Felix Oghina
-}
-
-define( 'TwitterPost_Version' , '1.3.5' );
+define( 'TwitterPost_Version' , '1.4.0' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -42,17 +34,7 @@ if (!class_exists("RF_TwitterPost")) {
 		
 		// Initialization function
 		function init() {
-			$plugins = get_option('active_plugins');
-			$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
-			//check to see if Twitter Friendly Links plugin is activated			
-			if ( in_array( $required_plugin , $plugins ) ) {
-				if (!function_exists("curl_init")) {
-					deactivate_plugins(__FILE__);
-					die("This plugin needs either <a href=\"http://www.php.net/curl\">PHP cURL</a> to be installed on your server or <a href\"http://wordpress.org/extend/plugins/twitter-friendly-links/\">Twitter Friendly Links Plugin</a> activated in Wordpress.");
-				} else {	
-					$this->getOptions();
-				}
-			}
+			$this->getOptions();
 		}
 		
 		/*--------------------------------------------------------------------
@@ -324,9 +306,7 @@ if (!function_exists("publish_to_twitter")) {
 			
 				$options = get_option('rf_twitterpost' . $optionsAppend);
 				
-				if(!empty($options)) {
-					$twitter = new Twitter($options['rf_twitteruser'], $options['rf_twitterpass']);
-					
+				if(!empty($options)) {					
 					$continue = FALSE;
 					if (!empty($options['rf_tweetcats'])) {
 						$cats = split(",", $options['rf_tweetcats']);
@@ -387,7 +367,7 @@ if (!function_exists("publish_to_twitter")) {
 					}
 					
 					if (strlen($tweet) <= 140) {
-						$twitter->update($tweet);
+						twitterpost_tweet($options['rf_twitteruser'], $options['rf_twitterpass'], $tweet);
 					}
 				}
 			}
@@ -399,14 +379,20 @@ if (!function_exists("publish_to_twitter")) {
 
 if (!function_exists("getTinyUrl")) {
 	function getTinyUrl($url) { 
-		$ch = curl_init(); 
-		$timeout = 5; 
-		curl_setopt($ch,CURLOPT_URL,'http://tinyurl.com/api-create.php?url='.$url); 
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1); 
-		curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout); 
-		$data = curl_exec($ch); 
-		curl_close($ch); 
-		return $data; 
+		$api_url = 'http://tinyurl.com/api-create.php?url=';
+		$request = new WP_Http;
+		$result = $request->request( $api_url . $url );
+		return $result['body']; 
+	}
+}
+
+if (!function_exists("twitterpost_tweet")) {
+	function twitterpost_tweet($un, $pw, $tweet) { 
+		$api_url = 'http://twitter.com/statuses/update.xml';
+		$body = array( 'status' => $tweet );
+		$headers = array( 'Authorization' => 'Basic '.base64_encode("$un:$pw") );
+		$request = new WP_Http;
+		$result = $request->request( $api_url , array( 'method' => 'POST', 'body' => $body, 'headers' => $headers ) );
 	}
 }
 

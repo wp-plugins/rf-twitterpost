@@ -2,9 +2,9 @@
 Contributors: layotte, fullthrottledevelopment
 Donate link: http://fullthrottledevelopment.com/contact
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
-Requires at least: 2.6
+Requires at least: 2.7
 Tested up to: 2.9.2
-Stable tag: 1.3.5
+Stable tag: 1.4.0
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
@@ -39,6 +39,12 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+
+= 1.4.0 =
+* Discovered WP_Http class (since WP2.7) which makes life much easier for everyone, but this bumps the support up to start at WP2.7)
+* Removed cURL requirement, switched to WP_Http API
+* Removed Twitter API Classes, switched to WP_Http API
+* Changes in cURL requirement required modification of init() function
 
 = 1.3.5 =
 * Moved URL shortening functionality for improved efficiency
