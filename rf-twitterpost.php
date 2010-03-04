@@ -4,12 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.4.0
+Version: 1.4.1
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
 
-define( 'TwitterPost_Version' , '1.4.0' );
+define( 'TwitterPost_Version' , '1.4.1' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -32,10 +32,10 @@ if (!class_exists("RF_TwitterPost")) {
 			$this->wp_version = $wp_version;
 		}
 		
-		// Initialization function
-		function init() {
-			$this->getOptions();
-		}
+		// Initialize options on plugin activation - NOT CURRENTLY NEEDED
+		//function init() {
+		//	$this->getOptions();
+		//}
 		
 		/*--------------------------------------------------------------------
 		    Administrative Functions
@@ -43,7 +43,7 @@ if (!class_exists("RF_TwitterPost")) {
 	  
 		// Option loader function
 		function getOptions($user_login = "") {
-			// Set default values for the options
+			// Default values for the options
 			$twitterUser 		= "";
 			$twitterPass 		= "";
 			$tweetFormat 		= "Blogged %TITLE%: %URL%";
@@ -70,8 +70,8 @@ if (!class_exists("RF_TwitterPost")) {
 				}
 			}
 			
-			// Update the options for the panel
-			update_option($this->optionsName . $optionsAppend, $options);
+			// Update the options for the panel - NOT CURRENTLY NEEDED
+			// update_option($this->adminOptionsName, $adminOptions);
 			return $options;
 		}
 		
@@ -330,10 +330,12 @@ if (!function_exists("publish_to_twitter")) {
 					
 					if (!$continue) return; // if not in an included category, return.
 					
+					// Get META tweet format
 					$tweet = htmlspecialchars(stripcslashes(get_post_meta($postID, 'rftp_tweet', true)));
 					
+					// If META tweet format is not set, use the default tweetformat set in options page(s)
 					if (!isset($tweet) || empty($tweet)) {
-						$tweet = $options['rf_tweetformat'];
+						$tweet = htmlspecialchars(stripcslashes($options['rf_tweetformat']));
 					}
 					
 					$tweetLen = strlen($tweet);
@@ -390,23 +392,47 @@ if (!function_exists("twitterpost_tweet")) {
 	function twitterpost_tweet($un, $pw, $tweet) { 
 		$api_url = 'http://twitter.com/statuses/update.xml';
 		$body = array( 'status' => $tweet );
-		$headers = array( 'Authorization' => 'Basic '.base64_encode("$un:$pw") );
+		$headers = array( 'Authorization' => 'Basic ' . base64_encode("$un:$pw") );
 		$request = new WP_Http;
 		$result = $request->request( $api_url , array( 'method' => 'POST', 'body' => $body, 'headers' => $headers ) );
 	}
 }
 
-if(!function_exists('str_ireplace')){
-	function str_ireplace($search,$replace,$subject){
-		$token = chr(1);
-		$haystack = strtolower($subject);
-		$needle = strtolower($search);
-			while (($pos=strpos($haystack,$needle))!==FALSE){
-				$subject = substr_replace($subject,$token,$pos,strlen($search));
-				$haystack = substr_replace($haystack,$token,$pos,strlen($search));
-			}
-		$subject = str_replace($token,$replace,$subject);
-		return $subject;
+// From PHP_Compat-1.6.0a2 Compat/Function/str_ireplace.php for PHP4 Compatibility
+if (!function_exists('str_ireplace')) {
+    function str_ireplace($search, $replace, $subject) {
+		// Sanity check
+		if (is_string($search) && is_array($replace)) {
+			user_error('Array to string conversion', E_USER_NOTICE);
+			$replace = (string) $replace;
+		}
+	
+		// If search isn't an array, make it one
+		$search = (array) $search;
+		$length_search = count($search);
+	
+		// build the replace array
+		$replace = is_array($replace)
+		? array_pad($replace, $length_search, '')
+		: array_pad(array(), $length_search, $replace);
+	
+		// If subject is not an array, make it one
+		$was_string = false;
+		if (is_string($subject)) {
+			$was_string = true;
+			$subject = array ($subject);
+		}
+	
+		// Prepare the search array
+		foreach ($search as $search_key => $search_value) {
+			$search[$search_key] = '/' . preg_quote($search_value, '/') . '/i';
+		}
+		
+		// Prepare the replace array (escape backreferences)
+		$replace = str_replace(array('\\', '$'), array('\\\\', '\$'), $replace);
+	
+		$result = preg_replace($search, $replace, $subject);
+		return $was_string ? $result[0] : $result;
 	}
 }
 
@@ -418,17 +444,11 @@ if (isset($dl_pluginRFTwitterPost)) {
 	  
 	// Add the admin menu
 	add_action('admin_menu', 'RF_TwitterPost_ap');
-	// Initialize options on plugin activation
-	add_action("activate_rf-twitterpost/rf-twitterpost.php",  array(&$dl_pluginRFTwitterPost, 'init'));
+	// Initialize options on plugin activation - NOT CURRENTLY NEEDED
+	// add_action("activate_rf-twitterpost/rf-twitterpost.php",  array(&$dl_pluginRFTwitterPost, 'init'));
 	
-	if (substr($dl_pluginRFTwitterPost->wp_version, 0, 3) >= '2.5') {
-		add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
-		add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
-	} else {
-		add_action('dbx_post_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
-		add_action('dbx_page_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
-	}
-	
+	add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
+	add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
 	add_action('edit_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	add_action('publish_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	add_action('save_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
