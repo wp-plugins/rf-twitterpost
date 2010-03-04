@@ -42,7 +42,7 @@ http://fullthrottledevelopment.com/twitter-post
 
 = 1.4.1 =
 * Fixed issue with not stripping slashes properly from default tweet format option
-* Removed uneeded option code for efficiency
+* Removed unneeded option code for efficiency
 * Updated str_ireplace function for better PHP4 compatibility
 
 = 1.4.0 =
