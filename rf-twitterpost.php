@@ -4,12 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.4.1
+Version: 1.5.0
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
 */
 
-define( 'TwitterPost_Version' , '1.4.1' );
+define( 'TwitterPost_Version' , '1.5.0' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -34,7 +34,7 @@ if (!class_exists("RF_TwitterPost")) {
 		
 		// Initialize options on plugin activation - NOT CURRENTLY NEEDED
 		//function init() {
-		//	$this->getOptions();
+			//$this->getOptions();
 		//}
 		
 		/*--------------------------------------------------------------------
@@ -88,11 +88,11 @@ if (!class_exists("RF_TwitterPost")) {
 			
 			// Get the user options
 			$options = $this->getOptions($user_login);
-										
-			if (isset($_POST['update_rf_twitterpost_settings'])) { 
+			
+			if (isset($_POST['update_rf_twitterpost_settings'])) { // || isset($_POST['test_rf_twitterpost_settings'])) {
 				if (isset($_POST['rf_twitteruser'])) {
 					$options[$this->twitterUser] = $_POST['rf_twitteruser'];
-				}	
+				}
 				
 				if (isset($_POST['rf_twitterpass'])) {
 					$options[$this->twitterPass] = $_POST['rf_twitterpass'];
@@ -113,20 +113,30 @@ if (!class_exists("RF_TwitterPost")) {
 					$optionsAppend = "_" . $user_login;
 				}
 				
-				update_option($this->optionsName . $optionsAppend, $options);
-				// update settings notification below
-				?>
-				<div class="updated"><p><strong><?php _e("Settings Updated.", "RF_TwitterPost");?></strong></p></div>
-			<?php
+				//if (isset($_POST['test_rf_twitterpost_settings'])) {
+				//	twitterpost_tweet($_POST['rf_twitteruser'], $_POST['rf_twitterpass'], "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja");
+					?>
+				<!--	<div class="updated"><p><strong><?php _e("Tweet Sent - You must press the Update Setting button for the setting to save.", "RF_TwitterPost");?></strong></p></div> -->
+					<?php
+				//} else if (isset($_POST['update_rf_twitterpost_settings'])) { 
+					update_option($this->optionsName . $optionsAppend, $options);
+					
+					// update settings notification below ?>
+					<div class="updated"><p><strong><?php _e("Settings Updated.", "RF_TwitterPost");?></strong></p></div>
+				<?php
+				//}
 			}
 			// Display HTML form for the options below
 			?>
 			<div class=wrap>
-				<form method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
+				<form id="twitterpost" method="post" action="<?php echo $_SERVER["REQUEST_URI"]; ?>">
 					<h2>Twitter Post Options</h2>
-					<p>Twitter Username: <input name="rf_twitteruser" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->twitterUser]), 'RF_TwitterPost') ?>" /></p>
-					<p>Twitter Password: <input name="rf_twitterpass" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->twitterPass]), 'RF_TwitterPost') ?>" type="password"/></p>
-					<p>Tweet Format: <input name="rf_tweetformat" maxlength="140" style="width: 75%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->tweetFormat]), 'RF_TwitterPost') ?>" /></p>
+                    <p>Twitter Username: <input id="un" type="text" name="rf_twitteruser" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',htmlspecialchars(stripcslashes($options[$this->twitterUser]))), 'RF_TwitterPost') ?>" />
+                    <input type="button" class="button" name="test_rf_twitterpost_settings" id="test_tweet" value="<?php _e('Send a Test Tweet', 'RF_TwitterPost') ?>" />
+					<?php wp_nonce_field( 'test_tweet' ); ?>
+                    </p>
+                    <p>Twitter Password: <input id="pw" name="rf_twitterpass" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',htmlspecialchars(stripcslashes($options[$this->twitterPass]))), 'RF_TwitterPost') ?>" type="password"/></p>
+					<p>Tweet Format: <input name="rf_tweetformat" type="text" maxlength="140" style="width: 75%;" value="<?php _e(apply_filters('format_to_edit',htmlspecialchars(stripcslashes($options[$this->tweetFormat]))), 'RF_TwitterPost') ?>" /></p>
                     <div class="tweet-format" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">Format Options:</p>
                     <ul style="font-size: 11px;">
@@ -134,7 +144,7 @@ if (!class_exists("RF_TwitterPost")) {
                         <li>%URL% - Displays TinyURL of your post in your Twitter feed.*</li>
                     </ul>
                     </div>
-                    <p>Tweet Categories: <input name="rf_tweetcats" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->tweetCats]), 'RF_TwitterPost') ?>" /></p>
+                    <p>Tweet Categories: <input name="rf_tweetcats" type="text" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',$options[$this->tweetCats]), 'RF_TwitterPost') ?>" /></p>
                     <div class="tweet-cats" style="margin-left: 50px;">
                     <p style="font-size: 11px; margin-bottom: 0px;">Display posts from several specific category IDs, e.g. 3,4,5<br />Display all posts except those from a category by prefixing its ID with a '-' (minus) sign, e.g. -3,-4,-5</p>
                     </div>
@@ -144,11 +154,11 @@ if (!class_exists("RF_TwitterPost")) {
                     <p style="font-size: 11px; margin-bottom: 0px;">Check this box if you want Twitter Post to tweet to each available author account.</p>
                     </div>
                     <?php } ?>
-                    <p style="font-size: 11px; margin-top: 50px;">*NOTE: Twitter currently only allows 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p>
+                    <p style="font-size: 11px; margin-top: 50px;">*NOTE: Twitter only allows a maximum of 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p>
                     
-					<div class="submit">
-						<input type="submit" name="update_rf_twitterpost_settings" value="<?php _e('Update Settings', 'RF_TwitterPost') ?>" />
-					</div>
+					<p class="submit">
+						<input class="button-primary" type="submit" name="update_rf_twitterpost_settings" value="<?php _e('Save Settings', 'RF_TwitterPost') ?>" />
+					</p>
 				</form>
 			</div>
 			<?php
@@ -222,7 +232,7 @@ if (!class_exists("RF_TwitterPost")) {
                         <li>%TITLE% - Displays Title of your post in your Twitter feed.*</li>
                         <li>%URL% - Displays TinyURL of your post in your Twitter feed.*</li>
                     </ul>
-                    <p>*NOTE: Twitter currently only allows 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p></td>
+                    <p>*NOTE: Twitter only allows a maximum of 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p></td>
             	</tr>
 			</table>
 			
@@ -261,6 +271,97 @@ if (!function_exists("RF_TwitterPost_ap")) {
 			add_option('rftp_exclude', '', 'Twitter Post Meta Tags Tweet Exclude', 'yes');
 		}
 	}	
+}
+
+// Example followed from http://codex.wordpress.org/AJAX_in_Plugins
+if (!function_exists("test_tweet_js")) {
+	function test_tweet_js() {
+	?>
+	<script type="text/javascript" >
+	jQuery(document).ready(function($) {
+		$('#test_tweet').click(function() {
+			var user = $('input#un').val();
+			if (user == "") {
+				$('input#un').focus();
+				return false;
+			}
+		
+			var pass = $('input#pw').val();
+			if (pass == "") {
+				$('input#pw').focus();
+				return false;
+			}
+		
+			var data = {
+				action: 'test_tweet',
+				un: user,
+				pw: pass,
+				_wpnonce: $('input#_wpnonce').val()
+			};
+			
+			var style = "position: absolute; " +
+						"display: none; " +
+						"z-index: 1000; " +
+						"top: 50%; " +
+						"left: 50%; " +
+						"background-color: #E8E8E8; " +
+						"border: 1px solid #555; " +
+						"padding: 15px; " +
+						"width: 350px; " +
+						"min-height: 80px; " +
+						"margin-left: -175px; " + 
+						"margin-top: -40px;" +
+						"text-align: center;" +
+						"vertical-align: middle;";
+			$('body').append("<div id='test_results' style='" + style + "'></div>");
+			$('#test_results').html("<p>Sending test tweet to Twitter</p>" +
+									"<p><img src='/wp-includes/js/thickbox/loadingAnimation.gif' /></p>");
+			$('#test_results').show();
+			
+			// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
+			jQuery.post(ajaxurl, data, function(response) {
+				$('#test_results').html('<p>' + response + '</p>' +
+										'<input type="button" class="button" name="results_ok_button" id="results_ok_button" value="OK" />');
+				$('#results_ok_button').click(remove_results);
+			});
+			
+		});
+		
+		function remove_results() {
+			jQuery("#results_ok_button").unbind("click");
+			jQuery("#test_results").remove();
+			if (typeof document.body.style.maxHeight == "undefined") {//if IE 6
+				jQuery("body","html").css({height: "auto", width: "auto"});
+				jQuery("html").css("overflow","");
+			}
+			document.onkeydown = "";
+			document.onkeyup = "";
+			return false;
+		}
+	});
+	</script>
+	
+	<?php
+	}
+}
+
+if (!function_exists("test_tweet_ajax")) {
+	function test_tweet_ajax() {
+		check_ajax_referer('test_tweet');
+		
+		$un = $_POST['un'];
+		$pw = $_POST['pw'];
+		$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja";
+		$result = twitterpost_tweet($un, $pw, $tweet);
+		
+		if ($result == 200) {
+			die("Successfully sent your tweet to Twitter.<br>Don't forget to save your settings.");
+		} else if ($result == 401) {
+			die("Could not authenticate you.<br>Please retype your twitter credentials and try again.");
+		} else {
+			die($result);
+		}
+	}
 }
 									
 // Add function to pubslih to twitter
@@ -384,7 +485,13 @@ if (!function_exists("getTinyUrl")) {
 		$api_url = 'http://tinyurl.com/api-create.php?url=';
 		$request = new WP_Http;
 		$result = $request->request( $api_url . $url );
-		return $result['body']; 
+		
+		if (is_wp_error($result)) {
+			return $url;
+			//return $result->get_error_message();
+		} else {
+			return $result['body']; 
+		}
 	}
 }
 
@@ -395,6 +502,14 @@ if (!function_exists("twitterpost_tweet")) {
 		$headers = array( 'Authorization' => 'Basic ' . base64_encode("$un:$pw") );
 		$request = new WP_Http;
 		$result = $request->request( $api_url , array( 'method' => 'POST', 'body' => $body, 'headers' => $headers ) );
+		
+		if (is_wp_error($result)) {
+			return $result->get_error_message();
+		} else if (isset($result["response"]["code"])) {
+			return $result["response"]["code"];
+		} else {
+			return false;
+		}
 	}
 }
 
@@ -441,7 +556,7 @@ if (isset($dl_pluginRFTwitterPost)) {
 	/*--------------------------------------------------------------------
 	    Actions
 	  --------------------------------------------------------------------*/
-	  
+
 	// Add the admin menu
 	add_action('admin_menu', 'RF_TwitterPost_ap');
 	// Initialize options on plugin activation - NOT CURRENTLY NEEDED
@@ -459,5 +574,9 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('future_to_publish', 'publish_to_twitter');
 	add_action('new_to_publish', 'publish_to_twitter');
 	add_action('draft_to_publish', 'publish_to_twitter');
+		  
+	// Add jQuery & AJAX for RF Twitter Post Test
+	add_action('admin_head', 'test_tweet_js');
+	add_action('wp_ajax_test_tweet', 'test_tweet_ajax');
 }
 ?>
