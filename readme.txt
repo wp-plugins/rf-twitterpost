@@ -55,6 +55,11 @@ http://fullthrottledevelopment.com/twitter-post
 * Made some styling changes to match current WordPress styling
 * Setup partial error reporting (as part of the test tweet) which I will extend into a debugging feature in a later version
 
+= 1.4.1 =
+* Fixed issue with not stripping slashes properly from default tweet format option
+* Removed unneeded option code for efficiency
+* Updated str_ireplace function for better PHP4 compatibility
+
 = 1.4.0 =
 * Discovered WP_Http class (since WP2.7) which makes life much easier for everyone, but this bumps the support up to start at WP2.7
 * Removed cURL requirement, switched to WP_Http API
