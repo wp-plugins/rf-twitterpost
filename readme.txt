@@ -1,26 +1,29 @@
 === RF Twitter Post ===
 Contributors: layotte, fullthrottledevelopment
-Donate link: http://fullthrottledevelopment.com/contact
-Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
+Donate link: http://fullthrottledevelopment.com/donate/
+Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 Requires at least: 2.8
 Tested up to: 2.9.2
-Stable tag: 1.5.0
+Stable tag: 1.5.1
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
 == Description ==
 
-Multiple Authors of your blog can have their own Twitter information setup under the User's section. So whenever they post it will send a tweet. It will also still send a tweet from the main Twitter account.
-You can choose which categories are included or excluded.
-You can now select individal posts not to be tweeted before you publish them.
-The Admin can choose to tweet to all author accounts in the main Twitter Post options page.
+With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter accoutn as well as their own twitter account. The admin can also choose to send a tweet to all authors twitter accounts whenever anyone publishes a post.
 
-This plugin allows you to tweet whenever you publish a new post.
-You can customize the tweet message and include the title or url with tags %TITLE% or %URL% (respectively).
-Twitter only allows up to 140 characters in a single tweet. Because of this restriction, the format + expanded tags cannot be more than 140 characters.
-If you include the %URL% tag, it is given priority. If it cannot fit into the format because your text is to long then it will be excluded entriley.
-If you include the %TITLE% tag and the post title causes the tweet to go over 140 characters, the plugin uses a substring of the post title, so it will fit in the tweet.
+With Twitter Post you can...
+choose which categories are included or excluded
+exclude individal posts from being tweeted before you publish them
+retweet a published post*
+choose to tweet to all authors
+customize the tweet format, including the post title and post URL (using the custom tags %TITLE% and %URL%, respectively)**
 
+Currently Twitter Post supports two URL shortening services. TinyURL is the default shortener, Twitter Post will attempt to get permalink of your post shortened by TinyURL. If it is unable to, it will use the regular site URL. The other shortener you can use is a WordPress plugin called [Twitter Friendly Links](http://wordpress.org/extend/plugins/twitter-friendly-links/). If Twitter Friendly Links is installed and activated on your website then Twitter Post will use it as the default shortener.
+
+* Twitter no longer allows the ability to tweet the same exact message more than once. This is an attempt to reduce SPAM in their system. I am not trying to encourage SPAM with the ReTweet feature, but I felt like it was an important feature to include. Because of the limitation imposed by Twitter, I had to add a random element to each ReTweet. Currently a random digit between 10 and 99 will be appended to a ReTweet. Also, you will only see the ReTweet option for published posts.
+
+** Twitter allows a maximum of 140 characters per tweet. If your custom format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).
 [Support](http://fullthrottledevelopment.com/contact)
 
 == Installation ==
@@ -39,6 +42,12 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+
+= 1.5.1 =
+* Fixed case sensitivity issue in tweet format
+* Added ability to ReTweet a published post
+* Removed and cleaned up some code
+* Cleaned up some validation techniques for test tweet feature
 
 = 1.5.0 =
 * Added ability to send a test tweet to Twitter (to verify everything is working); this bumps the support up to start at WP2.8 but will allow me to add a "re"-tweet feature in a later version.

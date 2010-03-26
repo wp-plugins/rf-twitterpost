@@ -4,12 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: A simple plugin that will post to twitter whenever you add a new post to your wordpress blog.
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.5.0
+Version: 1.5.1
 Author URI: http://fullthrottledevelopment.com/
-Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitterpost, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories
+Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.0' );
+define( 'TwitterPost_Version' , '1.5.1' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -31,11 +31,6 @@ if (!class_exists("RF_TwitterPost")) {
 			global $wp_version;
 			$this->wp_version = $wp_version;
 		}
-		
-		// Initialize options on plugin activation - NOT CURRENTLY NEEDED
-		//function init() {
-			//$this->getOptions();
-		//}
 		
 		/*--------------------------------------------------------------------
 		    Administrative Functions
@@ -70,8 +65,6 @@ if (!class_exists("RF_TwitterPost")) {
 				}
 			}
 			
-			// Update the options for the panel - NOT CURRENTLY NEEDED
-			// update_option($this->adminOptionsName, $adminOptions);
 			return $options;
 		}
 		
@@ -89,7 +82,7 @@ if (!class_exists("RF_TwitterPost")) {
 			// Get the user options
 			$options = $this->getOptions($user_login);
 			
-			if (isset($_POST['update_rf_twitterpost_settings'])) { // || isset($_POST['test_rf_twitterpost_settings'])) {
+			if (isset($_POST['update_rf_twitterpost_settings'])) {
 				if (isset($_POST['rf_twitteruser'])) {
 					$options[$this->twitterUser] = $_POST['rf_twitteruser'];
 				}
@@ -113,18 +106,10 @@ if (!class_exists("RF_TwitterPost")) {
 					$optionsAppend = "_" . $user_login;
 				}
 				
-				//if (isset($_POST['test_rf_twitterpost_settings'])) {
-				//	twitterpost_tweet($_POST['rf_twitteruser'], $_POST['rf_twitterpass'], "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja");
-					?>
-				<!--	<div class="updated"><p><strong><?php _e("Tweet Sent - You must press the Update Setting button for the setting to save.", "RF_TwitterPost");?></strong></p></div> -->
-					<?php
-				//} else if (isset($_POST['update_rf_twitterpost_settings'])) { 
-					update_option($this->optionsName . $optionsAppend, $options);
-					
-					// update settings notification below ?>
-					<div class="updated"><p><strong><?php _e("Settings Updated.", "RF_TwitterPost");?></strong></p></div>
+				update_option($this->optionsName . $optionsAppend, $options);
+				// update settings notification ?>
+				<div class="updated"><p><strong><?php _e("Settings Updated.", "RF_TwitterPost");?></strong></p></div>
 				<?php
-				//}
 			}
 			// Display HTML form for the options below
 			?>
@@ -133,7 +118,7 @@ if (!class_exists("RF_TwitterPost")) {
 					<h2>Twitter Post Options</h2>
                     <p>Twitter Username: <input id="un" type="text" name="rf_twitteruser" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',htmlspecialchars(stripcslashes($options[$this->twitterUser]))), 'RF_TwitterPost') ?>" />
                     <input type="button" class="button" name="test_rf_twitterpost_settings" id="test_tweet" value="<?php _e('Send a Test Tweet', 'RF_TwitterPost') ?>" />
-					<?php wp_nonce_field( 'test_tweet' ); ?>
+					<?php wp_nonce_field( 'test_tweet', 'test_tweet_wpnonce' ); ?>
                     </p>
                     <p>Twitter Password: <input id="pw" name="rf_twitterpass" style="width: 20%;" value="<?php _e(apply_filters('format_to_edit',htmlspecialchars(stripcslashes($options[$this->twitterPass]))), 'RF_TwitterPost') ?>" type="password"/></p>
 					<p>Tweet Format: <input name="rf_tweetformat" type="text" maxlength="140" style="width: 75%;" value="<?php _e(apply_filters('format_to_edit',htmlspecialchars(stripcslashes($options[$this->tweetFormat]))), 'RF_TwitterPost') ?>" /></p>
@@ -186,44 +171,36 @@ if (!class_exists("RF_TwitterPost")) {
 		
 		function twitterpost_add_meta_tags() {
 			global $post;
-			$post_id = $post;
-			
-			if (is_object($post_id)) {
-				$post_id = $post_id->ID;
-			}
-			
-			$tweet = htmlspecialchars(stripcslashes(get_post_meta($post_id, 'rftp_tweet', true)));
-            $exclude = get_post_meta($post_id, 'rftp_exclude', true); ?>
+						
+			$tweet = htmlspecialchars(stripcslashes(get_post_meta($post->ID, 'rftp_tweet', true)));
+            $exclude = get_post_meta($post->ID, 'rftp_exclude', true); ?>
 	
-			<?php if (substr($this->wp_version, 0, 3) >= '2.5') { ?>
-                    <div id="postrftp" class="postbox">
-                    <h3><?php _e('Twitter Post', 'twitter_post') ?></h3>
-                    <div class="inside">
-                    <div id="postrftp">
-			<?php } else { ?>
-                    <div class="dbx-b-ox-wrapper">
-                    <fieldset id="rtfpdiv" class="dbx-box">
-                    <div class="dbx-h-andle-wrapper">
-                    <h3 class="dbx-handle"><?php _e('RF Twitter Post', 'twitter_post') ?></h3>
-                    </div>
-                    <div class="dbx-c-ontent-wrapper">
-                    <div class="dbx-content">
-			<?php } ?>
+            <div id="postrftp" class="postbox">
+            <h3><?php _e('Twitter Post', 'twitter_post') ?></h3>
+            <div class="inside">
+            <div id="postrftp">
 		
-			<a target="__blank" href="http://fullthrottledevelopment.com/twitter-post"><?php _e('RF Twitter Post', 'twitter_post') ?></a>
+			<a target="__blank" href="http://fullthrottledevelopment.com/twitter-post"><?php _e('Click here for Support', 'twitter_post') ?></a>
 			<input value="rftp_edit" type="hidden" name="rftp_edit" />
-			<table style="margin-bottom:40px">
+			<table>
                 <tr>
-                <th style="text-align:left;" colspan="2">
+                <th style="text-align:right;" colspan="2">
                 </th>
                 </tr>
                 
-                <tr><th scope="row" style="text-align:right; width:150px; padding-right:10px;"><?php _e('Tweet Format:', 'twitter_post') ?></th>
-                <td><input value="<?php echo $tweet ?>" type="text" name="rftp_tweet" maxlength="140" size="90px"/></td></tr>
+                <tr><th scope="row" style="text-align:right; width:150px; padding-top: 5px; padding-bottom:5px; padding-right:10px;"><?php _e('Tweet Format:', 'twitter_post') ?></th>
+                <td><input value="<?php echo $tweet ?>" type="text" name="rftp_tweet" maxlength="140" size="80px"/></td></tr>
                 
                 
-                <tr><th scope="row" style="text-align:right; width:150px; padding-top: 5px; padding-right:10px;"><?php _e('Exclude this Post:', 'twitter_post') ?></th>
-                <td><input value="1" type="checkbox" name="rftp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> /></td></tr>
+                <tr><th scope="row" style="text-align:right; padding-top: 5px; padding-bottom:5px; padding-right:10px;"><?php _e('Exclude this Post:', 'twitter_post') ?></th>
+                <td>
+                    <input style="margin-top: 5px; value="1" type="checkbox" name="rftp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> />
+                    <?php // Only show ReTweet button if the post is "published"
+					if ($post->post_status == "publish") { ?>
+                    <input style="float: right;" type="button" class="button" name="retweet_twitterpost" id="retweet_button" value="<?php _e('ReTweet', 'RF_TwitterPost') ?>" />
+					<?php wp_nonce_field( 'retweet', 'retweet_wpnonce' ); ?>
+                    <?php } ?>
+                </td></tr>
                 <tr>
                 
                 <th scope="row" style="text-align:right; width:150px; vertical-align:top; padding-top: 5px; padding-right:10px;">Format Options:</th>
@@ -235,14 +212,9 @@ if (!class_exists("RF_TwitterPost")) {
                     <p>*NOTE: Twitter only allows a maximum of 140 characters per tweet. If your format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).</p></td>
             	</tr>
 			</table>
-			
-			<?php if (substr($this->wp_version, 0, 3) >= '2.5') { ?>
+
 			</div></div></div>
-			<?php } else { ?>
-			</div>
-			</fieldset>
-			</div>
-			<?php }
+            <?php 
 		}
 	}
 }
@@ -274,32 +246,68 @@ if (!function_exists("RF_TwitterPost_ap")) {
 }
 
 // Example followed from http://codex.wordpress.org/AJAX_in_Plugins
-if (!function_exists("test_tweet_js")) {
-	function test_tweet_js() {
+if (!function_exists("twitterpost_js")) {
+	function twitterpost_js() {
 	?>
-	<script type="text/javascript" >
+	<script type="text/javascript">
 	jQuery(document).ready(function($) {
-		$('#test_tweet').click(function() {
+		$('input#un').click(function() {
+			$('input#un').css('background-color', 'white');
+		});
+		
+		$('input#pw').click(function() {
+			$('input#pw').css('background-color', 'white');
+		});
+	
+		$('input#test_tweet').click(function() {
 			var user = $('input#un').val();
+			var error = false;
 			if (user == "") {
-				$('input#un').focus();
-				return false;
+				$('input#un').css('background-color', 'red');
+				error = true;
 			}
 		
 			var pass = $('input#pw').val();
 			if (pass == "") {
-				$('input#pw').focus();
-				return false;
+				$('input#pw').css('background-color', 'red');
+				error = true;
 			}
+			
+			if (error) { return false; }
 		
 			var data = {
-				action: 'test_tweet',
-				un: user,
-				pw: pass,
-				_wpnonce: $('input#_wpnonce').val()
+				action: 	'test_tweet',
+				un: 		user,
+				pw: 		pass,
+				_wpnonce: 	$('input#test_tweet_wpnonce').val()
+			};
+            
+            send_tweet(data);
+		});
+        
+        $('input#retweet_button').click(function() {
+			var data = {
+				action: 	'retweet',
+				id:  		$('input#post_ID').val(),
+				_wpnonce: 	$('input#retweet_wpnonce').val()
 			};
 			
-			var style = "position: absolute; " +
+			send_tweet(data);
+		});
+        
+        $('a.retweet_row_action').click(function() {
+			var data = {
+				action: 	'retweet',
+				id:  		$(this).attr('id'),
+				_wpnonce: 	$('input#retweet_wpnonce').val()
+			};
+			
+			send_tweet(data);
+		});
+        
+        // Probably should be named something better than send_tweet
+        function send_tweet(data) {
+			var style = "position: fixed; " +
 						"display: none; " +
 						"z-index: 1000; " +
 						"top: 50%; " +
@@ -313,27 +321,28 @@ if (!function_exists("test_tweet_js")) {
 						"margin-top: -40px;" +
 						"text-align: center;" +
 						"vertical-align: middle;";
-			$('body').append("<div id='test_results' style='" + style + "'></div>");
-			$('#test_results').html("<p>Sending test tweet to Twitter</p>" +
+			$('body').append("<div id='results' style='" + style + "'></div>");
+			$('#results').html("<p>Sending tweet to Twitter</p>" +
 									"<p><img src='/wp-includes/js/thickbox/loadingAnimation.gif' /></p>");
-			$('#test_results').show();
+			$('#results').show();
 			
 			// since 2.8 ajaxurl is always defined in the admin header and points to admin-ajax.php
 			jQuery.post(ajaxurl, data, function(response) {
-				$('#test_results').html('<p>' + response + '</p>' +
+				$('#results').html('<p>' + response + '</p>' +
 										'<input type="button" class="button" name="results_ok_button" id="results_ok_button" value="OK" />');
 				$('#results_ok_button').click(remove_results);
 			});
-			
-		});
+        }
 		
 		function remove_results() {
 			jQuery("#results_ok_button").unbind("click");
-			jQuery("#test_results").remove();
+			jQuery("#results").remove();
+			
 			if (typeof document.body.style.maxHeight == "undefined") {//if IE 6
 				jQuery("body","html").css({height: "auto", width: "auto"});
 				jQuery("html").css("overflow","");
 			}
+			
 			document.onkeydown = "";
 			document.onkeyup = "";
 			return false;
@@ -345,13 +354,14 @@ if (!function_exists("test_tweet_js")) {
 	}
 }
 
-if (!function_exists("test_tweet_ajax")) {
-	function test_tweet_ajax() {
+if (!function_exists("rftp_test_tweet_ajax")) {
+	function rftp_test_tweet_ajax() {
 		check_ajax_referer('test_tweet');
 		
 		$un = $_POST['un'];
 		$pw = $_POST['pw'];
-		$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja";
+		// In case they need to test more than once there is a random element added because Twitter blocks duplicate tweets
+		$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja " . rand(10,99);
 		$result = twitterpost_tweet($un, $pw, $tweet);
 		
 		if ($result == 200) {
@@ -363,10 +373,36 @@ if (!function_exists("test_tweet_ajax")) {
 		}
 	}
 }
+
+if (!function_exists("rftp_retweet_ajax")) {
+	function rftp_retweet_ajax() {
+		check_ajax_referer('retweet');
+		
+		$id = $_POST['id'];
+		
+		$results = publish_to_twitter($id, true);
+		
+		die($results);
+	}
+}
+
+if (!function_exists("retweet_row_action")) {
+	function retweet_row_action($actions) {
+		global $post;
+		
+		// Only show ReTweet button if the post is "published"
+		if ($post->post_status == "publish") {
+			$actions['retweet'] = "<a class='retweet_row_action' id='" . $post->ID . "' title='" . esc_attr(__('ReTweet this Post')) . "' href='#'>" . __('ReTweet') . "</a>" .
+			wp_nonce_field( 'retweet', 'retweet_wpnonce' );
+		}
+
+		return $actions;
+	}
+}
 									
 // Add function to pubslih to twitter
 if (!function_exists("publish_to_twitter")) {
-	function publish_to_twitter($postID) {
+	function publish_to_twitter($postID, $retweet = false) {
 		global $wpdb;
 	    $post = get_post($postID);
 		$maxLen = 140;
@@ -439,9 +475,14 @@ if (!function_exists("publish_to_twitter")) {
 						$tweet = htmlspecialchars(stripcslashes($options['rf_tweetformat']));
 					}
 					
+					// There needs to be a random element to all ReTweets because Twitter blocks all duplicate tweets
+					if ($retweet) {
+						$tweet .= " " . rand(10,99); //should be good enough, I'm not trying to encourage SPAM here
+					}
+					
 					$tweetLen = strlen($tweet);
 					
-					if (preg_match('%URL%', $tweet)) {
+					if (preg_match('/%URL%/i', $tweet)) {
 						$urlLen = strlen($url);
 						$totalLen = $urlLen + $tweetLen - 5; // subtract 5 for "%URL%".
 						
@@ -454,7 +495,7 @@ if (!function_exists("publish_to_twitter")) {
 					
 					$tweetLen = strlen($tweet);
 					
-					if (preg_match('%TITLE%', $tweet)) {
+					if (preg_match('/%TITLE%/i', $tweet)) {
 						$title = $post->post_title;
 					
 						$titleLen = strlen($title); 
@@ -469,26 +510,40 @@ if (!function_exists("publish_to_twitter")) {
 						}
 					}
 					
-					if (strlen($tweet) <= 140) {
-						twitterpost_tweet($options['rf_twitteruser'], $options['rf_twitterpass'], $tweet);
+					// If a user removes his UN or PW and saves, it will be blank - we may as well skip blank entries.
+					if ($options['rf_twitteruser'] != "" || $options['rf_twitterpass'] != "") {
+						if (strlen($tweet) <= 140) {
+							$result = twitterpost_tweet($options['rf_twitteruser'], $options['rf_twitterpass'], $tweet);
+							
+							if($result == "200") { // 200 should be a successful attempt
+								$results[] = $options['rf_twitteruser'] . " retweeted this post successfully.<br>";
+							} else if ($result == "401") { // 401 could not authenticate
+								$results[] = "Could not authenticate with ". $options['rf_twitteruser'] . "<br>";
+							} else { // Anything else is uknown... just print the error code received from Twitter
+								$results[] = "Received this error " . $result . " when tweeting for " . $options['rf_twitteruser'] . "<br>";
+							}
+						}
 					}
 				}
 			}
 		}
-		
+				
 		$wpdb->flush();
+		
+		// Combine all the results into one string, return is currently only used for retweet functionality
+		return implode($results);
 	}	
 }
 
+// Example followed from http://planetozh.com/blog/2009/08/how-to-make-http-requests-with-wordpress/
 if (!function_exists("getTinyUrl")) {
 	function getTinyUrl($url) { 
 		$api_url = 'http://tinyurl.com/api-create.php?url=';
 		$request = new WP_Http;
 		$result = $request->request( $api_url . $url );
 		
-		if (is_wp_error($result)) {
+		if (is_wp_error($result)) { //if we get an error just us the normal permalink URL
 			return $url;
-			//return $result->get_error_message();
 		} else {
 			return $result['body']; 
 		}
@@ -576,7 +631,11 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('draft_to_publish', 'publish_to_twitter');
 		  
 	// Add jQuery & AJAX for RF Twitter Post Test
-	add_action('admin_head', 'test_tweet_js');
-	add_action('wp_ajax_test_tweet', 'test_tweet_ajax');
+	add_action('admin_head', 'twitterpost_js');
+	add_action('wp_ajax_test_tweet', 'rftp_test_tweet_ajax');
+	add_action('wp_ajax_retweet', 'rftp_retweet_ajax');
+	
+	// edit-post.php post row update
+	add_filter('post_row_actions', 'retweet_row_action');
 }
 ?>
