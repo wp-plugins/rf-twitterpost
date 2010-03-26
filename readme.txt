@@ -10,7 +10,7 @@ A simple plugin that will post to twitter whenever you add a new post to your wo
 
 == Description ==
 
-With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter accoutn as well as their own twitter account. The admin can also choose to send a tweet to all authors twitter accounts whenever anyone publishes a post.
+With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter account as well as their own twitter account. The admin can also choose to send a tweet to all available twitter accounts whenever anyone publishes a post.
 
 With Twitter Post you can...
 choose which categories are included or excluded
