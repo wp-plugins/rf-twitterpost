@@ -1,10 +1,10 @@
 === RF Twitter Post ===
 Contributors: layotte, fullthrottledevelopment
-Donate link: http://fullthrottledevelopment.com/contact
+Donate link: http://fullthrottledevelopment.com/donate
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet
 Requires at least: 2.8
 Tested up to: 2.9.2
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
@@ -42,6 +42,8 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+= 1.5.2 =
+* Fixed bug introduced in WordPress 3.0 with publishing pages
 
 = 1.5.1 =
 * Fixed case sensitivity issue in tweet format
