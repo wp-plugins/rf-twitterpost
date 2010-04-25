@@ -1,7 +1,7 @@
 === RF Twitter Post ===
 Contributors: layotte, fullthrottledevelopment
-Donate link: http://fullthrottledevelopment.com/donate/
-Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
+Donate link: http://fullthrottledevelopment.com/donate
+Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet
 Requires at least: 2.8
 Tested up to: 2.9.2
 Stable tag: 1.5.1
@@ -10,7 +10,7 @@ A simple plugin that will post to twitter whenever you add a new post to your wo
 
 == Description ==
 
-With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter account as well as their own twitter account. The admin can also choose to send a tweet to all available twitter accounts whenever anyone publishes a post.
+With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter accoutn as well as their own twitter account. The admin can also choose to send a tweet to all authors twitter accounts whenever anyone publishes a post.
 
 With Twitter Post you can...
 choose which categories are included or excluded
@@ -54,11 +54,6 @@ http://fullthrottledevelopment.com/twitter-post
 * Made some efficiency fixes
 * Made some styling changes to match current WordPress styling
 * Setup partial error reporting (as part of the test tweet) which I will extend into a debugging feature in a later version
-
-= 1.4.1 =
-* Fixed issue with not stripping slashes properly from default tweet format option
-* Removed unneeded option code for efficiency
-* Updated str_ireplace function for better PHP4 compatibility
 
 = 1.4.0 =
 * Discovered WP_Http class (since WP2.7) which makes life much easier for everyone, but this bumps the support up to start at WP2.7
