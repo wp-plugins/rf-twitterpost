@@ -4,11 +4,14 @@ Donate link: http://fullthrottledevelopment.com/donate
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet
 Requires at least: 2.8
 Tested up to: 2.9.2
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
 == Description ==
+
+= ATTENTION TWITTER POST USERS =
+Recently Twitter announced announced that in less than seven weeks they will be shutting off the “basic authentication” API used by many WordPress plugins — including Twitter Post. Please fill out [this survey](http://fullthrottledevelopment.com/what-should-we-do-when-twitter-breaks-twitter-post) so we can gauge where we need to focus our energy to prevent Twitter Post from breaking on June 30th.
 
 With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter accoutn as well as their own twitter account. The admin can also choose to send a tweet to all authors twitter accounts whenever anyone publishes a post.
 
@@ -42,6 +45,9 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+= 1.5.3 =
+* Added link to survey about [what we should do when Twitter breaks Twitter Post] (http://fullthrottledevelopment.com/what-should-we-do-when-twitter-breaks-twitter-post)
+
 = 1.5.2 =
 * Fixed bug introduced in WordPress 3.0 with publishing pages
 
