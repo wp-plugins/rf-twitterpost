@@ -2,14 +2,14 @@
 /*
 Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
-Description: <strong>Twitter announced that in less than seven weeks they will be shutting off the "basic authentication" API used by many WordPress plugins -- including Twitter Post. Please take a moment to <a href="http://fullthrottledevelopment.com/what-should-we-do-when-twitter-breaks-twitter-post">fill out this short survey</a> so we can gauge where we need to focus our energy to prevent Twitter Post from breaking on June 30th.</strong>
+Description: <strong>Recently Twitter announced announced that in less than seven weeks they will be shutting off the "basic authentication" API used by many WordPress plugins — including Twitter Post. We asked you to take a survey to try to figure out what our next plan of action would be. 86% of over 200 respondants said they would not be willing to pay a nominal fee for this plugin. So, we will not pursue that route. There are some other options that we are going to consider. We will keep you updated.</strong>
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.5.3
+Version: 1.5.4
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.3' );
+define( 'TwitterPost_Version' , '1.5.4' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -622,7 +622,7 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('admin_menu', 'RF_TwitterPost_ap');
 	// Initialize options on plugin activation - NOT CURRENTLY NEEDED
 	// add_action("activate_rf-twitterpost/rf-twitterpost.php",  array(&$dl_pluginRFTwitterPost, 'init'));
-	add_action('admin_notices', 'twitterpost_activation_notice');
+	// add_action('admin_notices', 'twitterpost_activation_notice');
 	
 	add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
 	add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
