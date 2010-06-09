@@ -4,12 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: <strong>Recently Twitter announced announced that in less than seven weeks they will be shutting off the "basic authentication" API used by many WordPress plugins — including Twitter Post. We asked you to take a survey to try to figure out what our next plan of action would be. 86% of over 200 respondants said they would not be willing to pay a nominal fee for this plugin. So, we will not pursue that route. There are some other options that we are going to consider. We will keep you updated.</strong>
 Author: Lew Ayotte @ Full Throttle Development
-Version: 1.5.4
+Version: 1.5.5
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.4' );
+define( 'TwitterPost_Version' , '1.5.5' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -407,7 +407,7 @@ if (!function_exists("publish_to_twitter")) {
 	    $post = get_post($postID);
 		$maxLen = 140;
 		
-		if (get_post_meta($postID, 'rftp_exclude', true) == 1) return;
+		if (get_post_meta($postID, 'rftp_exclude', true)) return;
 		
 		// I've made an assumption that most users will include the %URL% text
 		// So, instead of trying to get the link several times for multi-user setups
