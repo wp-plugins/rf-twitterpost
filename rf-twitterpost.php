@@ -2,14 +2,14 @@
 /*
 Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
-Description: <strong>Recently Twitter announced announced that in less than seven weeks they will be shutting off the "basic authentication" API used by many WordPress plugins — including Twitter Post. We asked you to take a survey to try to figure out what our next plan of action would be. 86% of over 200 respondants said they would not be willing to pay a nominal fee for this plugin. So, we will not pursue that route. There are some other options that we are going to consider. We will keep you updated.</strong>
-Author: Lew Ayotte @ Full Throttle Development
-Version: 1.5.5
+Description: <strong>Update:</strong> If you were not aware, Twitter delayed their API takedown. It is now set to happen on August 16th, 2010 (<a href="http://countdowntooauth.com/" target="_blank">http://countdowntooauth.com/</a>). We have been working dilegently to create a new service that extends the usability of Twitter Post. This service will launched the a few days before Twitter kills their API. We hope to extend it to other services such as Facebook, Digg, Buzz, etc. We will also be charging 33 cents a month for a basic account. Until then, keep on enjoying TwitterPost. We've fixed a few bugs that I discovered while creating our new plugin/service.
+Author: Lew Ayotte
+Version: 1.5.6
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.5' );
+define( 'TwitterPost_Version' , '1.5.6' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -155,16 +155,17 @@ if (!class_exists("RF_TwitterPost")) {
 			if (isset($awmp_edit) && !empty($awmp_edit)) {
 				$tweet = $_POST["rftp_tweet"];
 				$exclude = $_POST["rftp_exclude"];
-	
-				delete_post_meta($id, 'rftp_tweet');
-				delete_post_meta($id, 'rftp_exclude');
 				
 				if (isset($tweet) && !empty($tweet)) {
 					add_post_meta($id, 'rftp_tweet', $tweet);
+				} else {
+					delete_post_meta($id, 'rftp_tweet');
 				}
 				
 				if (isset($exclude) && !empty($exclude)) {
 					add_post_meta($id, 'rftp_exclude', $exclude);
+				} else {
+					delete_post_meta($id, 'rftp_exclude');
 				}
 			}
 		}
@@ -364,10 +365,12 @@ if (!function_exists("rftp_test_tweet_ajax")) {
 		$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja " . rand(10,99);
 		$result = twitterpost_tweet($un, $pw, $tweet);
 		
-		if ($result == 200) {
-			die("Successfully sent your tweet to Twitter.<br>Don't forget to save your settings.");
-		} else if ($result == 401) {
-			die("Could not authenticate you.<br>Please retype your twitter credentials and try again.");
+		if (isset($result["response"]["code"])) {
+			if ($result['response']['code'] == 200) {
+				die("Successfully sent your tweet to Twitter.<br>Don't forget to save your settings.");
+			} else {
+				die($result['response']['message']);
+			}
 		} else {
 			die($result);
 		}
@@ -378,11 +381,19 @@ if (!function_exists("rftp_retweet_ajax")) {
 	function rftp_retweet_ajax() {
 		check_ajax_referer('retweet');
 		
-		$id = $_POST['id'];
+		$post = get_post($_POST['id']);
 		
-		$results = publish_to_twitter($id, true);
+		$result = publish_to_twitter($post, true);
 		
-		die($results);
+		if (isset($result["response"]["code"])) {
+			if ($result['response']['code'] == 200) {
+				die("Successfully sent your tweet to Twitter.");
+			} else {
+				die($result['response']['message']);
+			}
+		} else {
+			die("ERROR: Unknown error, please try again. If this continues to fail, contact support@leenk.me.");
+		}
 	}
 }
 
@@ -402,12 +413,13 @@ if (!function_exists("retweet_row_action")) {
 									
 // Add function to pubslih to twitter
 if (!function_exists("publish_to_twitter")) {
-	function publish_to_twitter($postID, $retweet = false) {
+	function publish_to_twitter($post, $retweet = false) {
 		global $wpdb;
-	    $post = get_post($postID);
 		$maxLen = 140;
 		
-		if (get_post_meta($postID, 'rftp_exclude', true)) return;
+		if (get_post_meta($post->ID, 'rftp_exclude', true)) {
+			return "You have set this post to not post to Twitter.<br />Edit the post and remove the Exclude check box.<br />";
+		}
 		
 		// I've made an assumption that most users will include the %URL% text
 		// So, instead of trying to get the link several times for multi-user setups
@@ -416,9 +428,9 @@ if (!function_exists("publish_to_twitter")) {
 		$required_plugin = 'twitter-friendly-links/twitter-friendly-links.php';
 		//check to see if Twitter Friendly Links plugin is activated			
 		if ( in_array( $required_plugin , $plugins ) ) {
-			$url = permalink_to_twitter_link(get_permalink($postID)); // if yes, we want to use that for our URL shortening service.
+			$url = permalink_to_twitter_link(get_permalink($post->ID)); // if yes, we want to use that for our URL shortening service.
 		} else {
-			$url = getTinyURL(get_permalink($postID)); //else use TinyURL's URL shortening service.
+			$url = getTinyURL(get_permalink($post->ID)); //else use TinyURL's URL shortening service.
 		}
 		
 		if ($post->post_type == 'post') {
@@ -451,7 +463,7 @@ if (!function_exists("publish_to_twitter")) {
 							if (preg_match('/^-\d+/', $cat)) {
 								$cat = preg_replace('/^-/', '', $cat);
 								if (in_category( (int)$cat, $post )) {
-									return; // if in an exluded category, return.
+									return "Post is in an excluded category.<br />"; // if in an exluded category, return.
 								} else  {
 									$continue = TRUE; // if not, than we can continue -- thanks Webmaster HC at hablacentro.com :)
 								}
@@ -465,19 +477,14 @@ if (!function_exists("publish_to_twitter")) {
 						$continue = TRUE;
 					}
 					
-					if (!$continue) return; // if not in an included category, return.
+					if (!$continue) return "Post is not in an included category.<br />"; // if not in an included category, return.
 					
 					// Get META tweet format
-					$tweet = htmlspecialchars(stripcslashes(get_post_meta($postID, 'rftp_tweet', true)));
+					$tweet = htmlspecialchars(stripcslashes(get_post_meta($post->ID, 'rftp_tweet', true)));
 					
 					// If META tweet format is not set, use the default tweetformat set in options page(s)
 					if (!isset($tweet) || empty($tweet)) {
 						$tweet = htmlspecialchars(stripcslashes($options['rf_tweetformat']));
-					}
-					
-					// There needs to be a random element to all ReTweets because Twitter blocks all duplicate tweets
-					if ($retweet) {
-						$tweet .= " " . rand(10,99); //should be good enough, I'm not trying to encourage SPAM here
 					}
 					
 					$tweetLen = strlen($tweet);
@@ -489,6 +496,7 @@ if (!function_exists("publish_to_twitter")) {
 						if ($totalLen <= $maxLen) {
 							$tweet = str_ireplace("%URL%", $url, $tweet);
 						} else {
+
 							$tweet = str_ireplace("%URL%", "", $tweet); // Too Long (need to get rid of URL).
 						}
 					}
@@ -514,14 +522,8 @@ if (!function_exists("publish_to_twitter")) {
 					if ($options['rf_twitteruser'] != "" || $options['rf_twitterpass'] != "") {
 						if (strlen($tweet) <= 140) {
 							$result = twitterpost_tweet($options['rf_twitteruser'], $options['rf_twitterpass'], $tweet);
-							
-							if($result == "200") { // 200 should be a successful attempt
-								$results[] = $options['rf_twitteruser'] . " retweeted this post successfully.<br>";
-							} else if ($result == "401") { // 401 could not authenticate
-								$results[] = "Could not authenticate with ". $options['rf_twitteruser'] . "<br>";
-							} else { // Anything else is uknown... just print the error code received from Twitter
-								$results[] = "Received this error " . $result . " when tweeting for " . $options['rf_twitteruser'] . "<br>";
-							}
+						} else {
+							$result = "Tweet was larger than 140 characters.<br />Please update your Tweet Format<br />";
 						}
 					}
 				}
@@ -532,7 +534,7 @@ if (!function_exists("publish_to_twitter")) {
 		
 		// Combine all the results into one string, return is currently only used for retweet functionality
 		if ($retweet) { // Added because of compat issue with WP3.0
-			return implode($results);
+			return $result;
 		}
 	}	
 }
@@ -563,9 +565,9 @@ if (!function_exists("twitterpost_tweet")) {
 		if (is_wp_error($result)) {
 			return $result->get_error_message();
 		} else if (isset($result["response"]["code"])) {
-			return $result["response"]["code"];
+			return $result;
 		} else {
-			return false;
+			return "Undefined Error Occurred<br />";
 		}
 	}
 }
@@ -607,11 +609,11 @@ if (!function_exists('str_ireplace')) {
 		return $was_string ? $result[0] : $result;
 	}
 }
-		
+
 function twitterpost_activation_notice() {
 	 echo '<div id="message" class="error fade"><p><strong>Attention Twitter Post Users</strong><br>Twitter will be shutting off an API used by many Twitter plugins. Please take <a href="http://fullthrottledevelopment.com/what-should-we-do-when-twitter-breaks-twitter-post">this short survey</a> so we can gauge how to best support your needs.</p></div>';
 }
-		
+
 // Actions and filters	
 if (isset($dl_pluginRFTwitterPost)) {
 	/*--------------------------------------------------------------------
@@ -624,18 +626,18 @@ if (isset($dl_pluginRFTwitterPost)) {
 	// add_action("activate_rf-twitterpost/rf-twitterpost.php",  array(&$dl_pluginRFTwitterPost, 'init'));
 	// add_action('admin_notices', 'twitterpost_activation_notice');
 	
-	add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
-	add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'));
+	add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'), 1);
 	add_action('edit_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	add_action('publish_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	add_action('save_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
-	add_action('edit_page_form', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	add_action('new_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	add_action('draft_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
+	add_action('future_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	
 	// Whenever you publish a post, post to twitter
-	// add_action('publish_post', 'publish_to_twitter');	# publishing to twitter, even when a published post is edited and saved
-	add_action('future_to_publish', 'publish_to_twitter');
-	add_action('new_to_publish', 'publish_to_twitter');
-	add_action('draft_to_publish', 'publish_to_twitter');
+	add_action('new_to_publish', 'publish_to_twitter', 100);
+	add_action('draft_to_publish', 'publish_to_twitter', 100);
+	add_action('future_to_publish', 'publish_to_twitter', 100);
 		  
 	// Add jQuery & AJAX for RF Twitter Post Test
 	add_action('admin_head', 'twitterpost_js');

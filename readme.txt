@@ -4,14 +4,14 @@ Donate link: http://fullthrottledevelopment.com/donate
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet
 Requires at least: 2.8
 Tested up to: 3.0
-Stable tag: 1.5.5
+Stable tag: 1.5.6
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
 == Description ==
 
 = ATTENTION TWITTER POST USERS =
-Recently Twitter announced announced that in less than seven weeks they will be shutting off the "basic authentication" API used by many WordPress plugins — including Twitter Post. We asked you to take a survey to try to figure out what our next plan of action would be. 86% of over 200 respondants said they would not be willing to pay a nominal fee for this plugin. So, we will not pursue that route. There are some other options that we are going to consider. We will keep you updated.
+Recently Twitter announced announced that they will be shutting off the "basic authentication" API used by many WordPress plugins — including Twitter Post. We have been working diligently to create a new service that uses Twitters recommended API. This new service will be launched a few days before Twitter shuts down their API. We will be charging 33 cents a month to use the service. We also plan on extending it to Facebook, Digg, Buzz, etc. We hope to have the Facebook connect setup before launch!
 
 With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter accoutn as well as their own twitter account. The admin can also choose to send a tweet to all authors twitter accounts whenever anyone publishes a post.
 
@@ -45,6 +45,9 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+= 1.5.6 =
+* Fixed a few bugs discovered while creating new Twitter oAuth service.
+
 = 1.5.5 =
 * Fixed exclude post issue.
 
