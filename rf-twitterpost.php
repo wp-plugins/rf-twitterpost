@@ -4,12 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: <strong>Update:</strong> If you were not aware, Twitter delayed their API takedown. It is now set to happen on August 16th, 2010 (<a href="http://countdowntooauth.com/" target="_blank">http://countdowntooauth.com/</a>). We have been working dilegently to create a new service that extends the usability of Twitter Post. This service will launched the a few days before Twitter kills their API. We hope to extend it to other services such as Facebook, Digg, Buzz, etc. We will also be charging 33 cents a month for a basic account. Until then, keep on enjoying TwitterPost. We've fixed a few bugs that I discovered while creating our new plugin/service.
 Author: Lew Ayotte
-Version: 1.5.6
+Version: 1.5.7
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.6' );
+define( 'TwitterPost_Version' , '1.5.7' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -42,12 +42,14 @@ if (!class_exists("RF_TwitterPost")) {
 			$twitterUser 		= "";
 			$twitterPass 		= "";
 			$tweetFormat 		= "Blogged %TITLE%: %URL%";
+			$tweetCats		= "";
+			$tweetAllUsers		= "";
 			
 			$options = array(
 								 $this->twitterUser 		=> $twitterUser,
 								 $this->twitterPass 		=> $twitterPass,
 								 $this->tweetFormat 		=> $tweetFormat,
-								 $this->tweetCategories 	=> $tweetCats,
+								 $this->tweetCats 		=> $tweetCats,
 								 $this->tweetAllUsers		=> $tweetAllUsers
 							);
 								 
@@ -149,24 +151,17 @@ if (!class_exists("RF_TwitterPost")) {
 			<?php
 		}
 		
-		function twitterpost_meta_tags($id) {
-			$awmp_edit = $_POST["rftp_edit"];
-			
-			if (isset($awmp_edit) && !empty($awmp_edit)) {
-				$tweet = $_POST["rftp_tweet"];
-				$exclude = $_POST["rftp_exclude"];
-				
-				if (isset($tweet) && !empty($tweet)) {
-					add_post_meta($id, 'rftp_tweet', $tweet);
-				} else {
-					delete_post_meta($id, 'rftp_tweet');
-				}
-				
-				if (isset($exclude) && !empty($exclude)) {
-					add_post_meta($id, 'rftp_exclude', $exclude);
-				} else {
-					delete_post_meta($id, 'rftp_exclude');
-				}
+		function twitterpost_meta_tags($post) {
+			if (isset($_POST["rftp_tweet"]) && !empty($_POST["rftp_tweet"])) {
+				update_post_meta($post->ID, 'rftp_tweet', $_POST["rftp_tweet"]);
+			} else {
+				delete_post_meta($post->ID, 'rftp_tweet');
+			}
+
+			if (isset($_POST["rftp_exclude"]) && !empty($_POST["rftp_exclude"])) {
+				update_post_meta($post->ID, 'rftp_exclude', $_POST["rftp_exclude"]);
+			} else {
+				delete_post_meta($post->ID, 'rftp_exclude');
 			}
 		}
 		
@@ -182,7 +177,6 @@ if (!class_exists("RF_TwitterPost")) {
             <div id="postrftp">
 		
 			<a target="__blank" href="http://fullthrottledevelopment.com/twitter-post"><?php _e('Click here for Support', 'twitter_post') ?></a>
-			<input value="rftp_edit" type="hidden" name="rftp_edit" />
 			<table>
                 <tr>
                 <th style="text-align:right;" colspan="2">
@@ -195,7 +189,7 @@ if (!class_exists("RF_TwitterPost")) {
                 
                 <tr><th scope="row" style="text-align:right; padding-top: 5px; padding-bottom:5px; padding-right:10px;"><?php _e('Exclude this Post:', 'twitter_post') ?></th>
                 <td>
-                    <input style="margin-top: 5px; value="1" type="checkbox" name="rftp_exclude" <?php if ((int)$exclude == 1) echo "checked"; ?> />
+                    <input style="margin-top: 5px; value="1" type="checkbox" name="rftp_exclude" <?php if ($exclude == "on") echo "checked"; ?> />
                     <?php // Only show ReTweet button if the post is "published"
 					if ($post->post_status == "publish") { ?>
                     <input style="float: right;" type="button" class="button" name="retweet_twitterpost" id="retweet_button" value="<?php _e('ReTweet', 'RF_TwitterPost') ?>" />
@@ -417,7 +411,7 @@ if (!function_exists("publish_to_twitter")) {
 		global $wpdb;
 		$maxLen = 140;
 		
-		if (get_post_meta($post->ID, 'rftp_exclude', true)) {
+		if (get_post_meta($post->ID, 'rftp_exclude', true) == "on") {
 			return "You have set this post to not post to Twitter.<br />Edit the post and remove the Exclude check box.<br />";
 		}
 		
@@ -635,9 +629,9 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('future_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	
 	// Whenever you publish a post, post to twitter
-	add_action('new_to_publish', 'publish_to_twitter', 100);
-	add_action('draft_to_publish', 'publish_to_twitter', 100);
-	add_action('future_to_publish', 'publish_to_twitter', 100);
+	add_action('new_to_publish', 'publish_to_twitter', 20);
+	add_action('draft_to_publish', 'publish_to_twitter', 20);
+	add_action('future_to_publish', 'publish_to_twitter', 20);
 		  
 	// Add jQuery & AJAX for RF Twitter Post Test
 	add_action('admin_head', 'twitterpost_js');
@@ -646,5 +640,4 @@ if (isset($dl_pluginRFTwitterPost)) {
 	
 	// edit-post.php post row update
 	add_filter('post_row_actions', 'retweet_row_action');
-}
-?>
+} ?>
