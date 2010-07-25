@@ -45,6 +45,9 @@ This section describes how to install the plugin and get it working.
 http://fullthrottledevelopment.com/twitter-post
 
 == Release History ==
+= 1.5.8 =
+* Fixed some deprecated functions, reduced some code bloat, updated some error checking.
+
 = 1.5.7 =
 * Fixed some PHP Warnings caused by Object to String conversions.
 

@@ -4,12 +4,12 @@ Plugin Name: TwitterPost
 Plugin URI: http://fullthrottledevelopment.com/twitter-post
 Description: <strong>Update:</strong> If you were not aware, Twitter delayed their API takedown. It is now set to happen on August 16th, 2010 (<a href="http://countdowntooauth.com/" target="_blank">http://countdowntooauth.com/</a>). We have been working dilegently to create a new service that extends the usability of Twitter Post. This service will launched the a few days before Twitter kills their API. We hope to extend it to other services such as Facebook, Digg, Buzz, etc. We will also be charging 33 cents a month for a basic account. Until then, keep on enjoying TwitterPost. We've fixed a few bugs that I discovered while creating our new plugin/service.
 Author: Lew Ayotte
-Version: 1.5.7
+Version: 1.5.8
 Author URI: http://fullthrottledevelopment.com/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.7' );
+define( 'TwitterPost_Version' , '1.5.8' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -42,14 +42,14 @@ if (!class_exists("RF_TwitterPost")) {
 			$twitterUser 		= "";
 			$twitterPass 		= "";
 			$tweetFormat 		= "Blogged %TITLE%: %URL%";
-			$tweetCats		= "";
+			$tweetCats			= "";
 			$tweetAllUsers		= "";
 			
 			$options = array(
 								 $this->twitterUser 		=> $twitterUser,
 								 $this->twitterPass 		=> $twitterPass,
 								 $this->tweetFormat 		=> $tweetFormat,
-								 $this->tweetCats 		=> $tweetCats,
+								 $this->tweetCats 			=> $tweetCats,
 								 $this->tweetAllUsers		=> $tweetAllUsers
 							);
 								 
@@ -151,17 +151,17 @@ if (!class_exists("RF_TwitterPost")) {
 			<?php
 		}
 		
-		function twitterpost_meta_tags($post) {
+		function twitterpost_meta_tags($post_id) {
 			if (isset($_POST["rftp_tweet"]) && !empty($_POST["rftp_tweet"])) {
-				update_post_meta($post->ID, 'rftp_tweet', $_POST["rftp_tweet"]);
+				update_post_meta($post_id, 'rftp_tweet', $_POST["rftp_tweet"]);
 			} else {
-				delete_post_meta($post->ID, 'rftp_tweet');
+				delete_post_meta($post_id, 'rftp_tweet');
 			}
 
 			if (isset($_POST["rftp_exclude"]) && !empty($_POST["rftp_exclude"])) {
-				update_post_meta($post->ID, 'rftp_exclude', $_POST["rftp_exclude"]);
+				update_post_meta($post_id, 'rftp_exclude', $_POST["rftp_exclude"]);
 			} else {
-				delete_post_meta($post->ID, 'rftp_exclude');
+				delete_post_meta($post_id, 'rftp_exclude');
 			}
 		}
 		
@@ -229,13 +229,13 @@ if (!function_exists("RF_TwitterPost_ap")) {
 		}
 		
 		if (function_exists('add_options_page')) {
-			add_options_page('Twitter Post Options', 'Twitter Post Options', 9, basename(__FILE__), array(&$dl_pluginRFTwitterPost, 'printTwitterPostOptionsPage'));
-			add_submenu_page('users.php', 'Twitter Post User Options', 'Twitter Post User Options', 2, basename(__FILE__), array(&$dl_pluginRFTwitterPost, 'printTwitterPostUsersOptionsPage'));
+			add_options_page('Twitter Post Options', 'Twitter Post Options', 'manage_options', basename(__FILE__), array(&$dl_pluginRFTwitterPost, 'printTwitterPostOptionsPage'));
+			add_submenu_page('users.php', 'Twitter Post User Options', 'Twitter Post User Options', 'publish_posts', basename(__FILE__), array(&$dl_pluginRFTwitterPost, 'printTwitterPostUsersOptionsPage'));
 		}
 		
 		if (function_exists('add_option')) {
-			add_option('rftp_tweet', '', 'Twitter Post Meta Tags Tweet', 'yes');
-			add_option('rftp_exclude', '', 'Twitter Post Meta Tags Tweet Exclude', 'yes');
+			add_option('rftp_tweet');
+			add_option('rftp_exclude');
 		}
 	}	
 }
@@ -353,20 +353,24 @@ if (!function_exists("rftp_test_tweet_ajax")) {
 	function rftp_test_tweet_ajax() {
 		check_ajax_referer('test_tweet');
 		
-		$un = $_POST['un'];
-		$pw = $_POST['pw'];
-		// In case they need to test more than once there is a random element added because Twitter blocks duplicate tweets
-		$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja " . rand(10,99);
-		$result = twitterpost_tweet($un, $pw, $tweet);
-		
-		if (isset($result["response"]["code"])) {
-			if ($result['response']['code'] == 200) {
-				die("Successfully sent your tweet to Twitter.<br>Don't forget to save your settings.");
+		if (isset($_POST['un']) && isset($_POST['pw'])) {
+			$un = $_POST['un'];
+			$pw = $_POST['pw'];
+			// In case they need to test more than once there is a random element added because Twitter blocks duplicate tweets
+			$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja " . rand(10,99);
+			$result = twitterpost_tweet($un, $pw, $tweet);
+			
+			if (isset($result["response"]["code"])) {
+				if ($result['response']['code'] == 200) {
+					die("Successfully sent your tweet to Twitter.<br>Don't forget to save your settings.");
+				} else {
+					die($result['response']['message']);
+				}
 			} else {
-				die($result['response']['message']);
+				die($result);
 			}
 		} else {
-			die($result);
+			die("Please fill in the Username and Password fields.");
 		}
 	}
 }
@@ -375,26 +379,28 @@ if (!function_exists("rftp_retweet_ajax")) {
 	function rftp_retweet_ajax() {
 		check_ajax_referer('retweet');
 		
-		$post = get_post($_POST['id']);
-		
-		$result = publish_to_twitter($post, true);
-		
-		if (isset($result["response"]["code"])) {
-			if ($result['response']['code'] == 200) {
-				die("Successfully sent your tweet to Twitter.");
+		if (isset($_POST['id'])) {
+			$post = get_post($_POST['id']);
+			
+			$result = publish_to_twitter($post, true);
+			
+			if (isset($result["response"]["code"])) {
+				if ($result['response']['code'] == 200) {
+					die("Successfully sent your tweet to Twitter.");
+				} else {
+					die($result['response']['message']);
+				}
 			} else {
-				die($result['response']['message']);
+				die("ERROR: Unknown error, please try again. If this continues to fail, contact support@leenk.me.");
 			}
 		} else {
-			die("ERROR: Unknown error, please try again. If this continues to fail, contact support@leenk.me.");
+			die("ERROR: Unable to determine Post ID.");
 		}
 	}
 }
 
 if (!function_exists("retweet_row_action")) {
-	function retweet_row_action($actions) {
-		global $post;
-		
+	function retweet_row_action($actions, $post) {
 		// Only show ReTweet button if the post is "published"
 		if ($post->post_status == "publish") {
 			$actions['retweet'] = "<a class='retweet_row_action' id='" . $post->ID . "' title='" . esc_attr(__('ReTweet this Post')) . "' href='#'>" . __('ReTweet') . "</a>" .
@@ -523,7 +529,6 @@ if (!function_exists("publish_to_twitter")) {
 				}
 			}
 		}
-				
 		$wpdb->flush();
 		
 		// Combine all the results into one string, return is currently only used for retweet functionality
@@ -621,12 +626,7 @@ if (isset($dl_pluginRFTwitterPost)) {
 	// add_action('admin_notices', 'twitterpost_activation_notice');
 	
 	add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'), 1);
-	add_action('edit_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
-	add_action('publish_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	add_action('save_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
-	add_action('new_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
-	add_action('draft_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
-	add_action('future_to_publish', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
 	
 	// Whenever you publish a post, post to twitter
 	add_action('new_to_publish', 'publish_to_twitter', 20);
@@ -639,5 +639,5 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('wp_ajax_retweet', 'rftp_retweet_ajax');
 	
 	// edit-post.php post row update
-	add_filter('post_row_actions', 'retweet_row_action');
+	add_filter('post_row_actions', 'retweet_row_action', 10, 2);
 } ?>
