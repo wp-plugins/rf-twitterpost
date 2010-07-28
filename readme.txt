@@ -4,7 +4,7 @@ Donate link: http://fullthrottledevelopment.com/donate
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet
 Requires at least: 2.8
 Tested up to: 3.0
-Stable tag: 1.5.7
+Stable tag: 1.5.8
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
