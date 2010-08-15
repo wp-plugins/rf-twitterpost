@@ -1,33 +1,16 @@
 === RF Twitter Post ===
-Contributors: layotte, fullthrottledevelopment
-Donate link: http://fullthrottledevelopment.com/donate
-Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet
+Contributors: layotte
+Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, leenk.me, leenk, leenkme
 Requires at least: 2.8
 Tested up to: 3.0
-Stable tag: 1.5.8
+Stable tag: 1.5.9
 
 A simple plugin that will post to twitter whenever you add a new post to your wordpress blog. 
 
 == Description ==
 
 = ATTENTION TWITTER POST USERS =
-Recently Twitter announced announced that they will be shutting off the "basic authentication" API used by many WordPress plugins — including Twitter Post. We have been working diligently to create a new service that uses Twitters recommended API. This new service will be launched a few days before Twitter shuts down their API. We will be charging 33 cents a month to use the service. We also plan on extending it to Facebook, Digg, Buzz, etc. We hope to have the Facebook connect setup before launch!
-
-With Twitter Post every author of your blog can have their own Twitter information stored under the User's section. Whenever they post to your blog it will automatically tweet a message to the admin twitter accoutn as well as their own twitter account. The admin can also choose to send a tweet to all authors twitter accounts whenever anyone publishes a post.
-
-With Twitter Post you can...
-choose which categories are included or excluded
-exclude individal posts from being tweeted before you publish them
-retweet a published post*
-choose to tweet to all authors
-customize the tweet format, including the post title and post URL (using the custom tags %TITLE% and %URL%, respectively)**
-
-Currently Twitter Post supports two URL shortening services. TinyURL is the default shortener, Twitter Post will attempt to get permalink of your post shortened by TinyURL. If it is unable to, it will use the regular site URL. The other shortener you can use is a WordPress plugin called [Twitter Friendly Links](http://wordpress.org/extend/plugins/twitter-friendly-links/). If Twitter Friendly Links is installed and activated on your website then Twitter Post will use it as the default shortener.
-
-* Twitter no longer allows the ability to tweet the same exact message more than once. This is an attempt to reduce SPAM in their system. I am not trying to encourage SPAM with the ReTweet feature, but I felt like it was an important feature to include. Because of the limitation imposed by Twitter, I had to add a random element to each ReTweet. Currently a random digit between 10 and 99 will be appended to a ReTweet. Also, you will only see the ReTweet option for published posts.
-
-** Twitter allows a maximum of 140 characters per tweet. If your custom format is too long to accommodate %TITLE% and/or %URL% then this plugin will cut off your title to fit and/or remove the URL. URL is given preference (since it's either all or nothing). So if your TITLE ends up making your Tweet go over the 140 characters, it will take a substring of your title (plus some ellipsis).
-[Support](http://fullthrottledevelopment.com/contact)
+On August 16th, 2010, Twitter killed their basic authentication API which was used by Twitter Post. In anticipation of this, we created a new service called [leenk.me](http://leenk.me/). If you want to continue publishing to your Twitter account whenever you publish a new post in WordPress, we recommend using the [leenk.me WordPress plugin](http://wordpress.org/extend/plugins/leenkme/). RF Twitter Post will no longer work or be supported.
 
 == Installation ==
 
@@ -42,9 +25,12 @@ This section describes how to install the plugin and get it working.
 
 = Where can I find help or make suggestions? =
 
-http://fullthrottledevelopment.com/twitter-post
+http://leenk.me/contact/
 
-== Release History ==
+== Changelog ==
+= 1.5.9 =
+* Final Update to Twitter Post. Twitter Post will no longer work after Twitter kills their basic authentication API on August 16th. To continue posting to Twitter, install the [leenk.me WordPress plugin](http://wordpress.org/extend/plugins/leenkme/).
+
 = 1.5.8 =
 * Fixed some deprecated functions, reduced some code bloat, updated some error checking.
 

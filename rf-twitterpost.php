@@ -1,15 +1,15 @@
 <?php
 /*
 Plugin Name: TwitterPost
-Plugin URI: http://fullthrottledevelopment.com/twitter-post
-Description: <strong>Update:</strong> If you were not aware, Twitter delayed their API takedown. It is now set to happen on August 16th, 2010 (<a href="http://countdowntooauth.com/" target="_blank">http://countdowntooauth.com/</a>). We have been working dilegently to create a new service that extends the usability of Twitter Post. This service will launched the a few days before Twitter kills their API. We hope to extend it to other services such as Facebook, Digg, Buzz, etc. We will also be charging 33 cents a month for a basic account. Until then, keep on enjoying TwitterPost. We've fixed a few bugs that I discovered while creating our new plugin/service.
+Plugin URI: http://leenk.me/
+Description: <strong>Attention Twitter Post Users</strong> On August 16th, 2010 Twitter closed their basic authentication API (<a href="http://countdowntooauth.com/" target="_blank">http://countdowntooauth.com/</a>). We have been working dilegently to create a new service called <a href="http://leenk.me/">leenk.me</a> that extends the usability of Twitter Post. Currently leenk.me allows you to publish your content to Twitter and Facebook, with Google Buzz coming soon (as well as others). We soft-launched the service on August 9th, 2010 with a lot of success. To use leenk.me you will need the <a href="http://wordpress.org/extend/plugins/leenkme/">leenk.me WordPress plugin</a> as well as a leenk.me account. leenk.me is extremely inexpensive; each account is free for the first month then starts at only 99 cents for 3 months of service. <strong>For security reasons, if you delete RF Twitter Post from your plugins, it will automatically remove all the Twitter Credentials that it stored in your WordPress database.</strong>
 Author: Lew Ayotte
-Version: 1.5.8
-Author URI: http://fullthrottledevelopment.com/
+Version: 1.5.9
+Author URI: http://leenk.me/
 Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, javascript, ajax
 */
 
-define( 'TwitterPost_Version' , '1.5.8' );
+define( 'TwitterPost_Version' , '1.5.9' );
 		
 // Define class
 if (!class_exists("RF_TwitterPost")) {
@@ -176,7 +176,7 @@ if (!class_exists("RF_TwitterPost")) {
             <div class="inside">
             <div id="postrftp">
 		
-			<a target="__blank" href="http://fullthrottledevelopment.com/twitter-post"><?php _e('Click here for Support', 'twitter_post') ?></a>
+			<a target="__blank" href="http://leenk.me/contact/"><?php _e('Click here for Support', 'twitter_post') ?></a>
 			<table>
                 <tr>
                 <th style="text-align:right;" colspan="2">
@@ -357,7 +357,7 @@ if (!function_exists("rftp_test_tweet_ajax")) {
 			$un = $_POST['un'];
 			$pw = $_POST['pw'];
 			// In case they need to test more than once there is a random element added because Twitter blocks duplicate tweets
-			$tweet = "Testing @Full_Throttle's Twitter Post Plugin for #WordPress - http://tinyurl.com/de5xja " . rand(10,99);
+			$tweet = "Testing @leenk.me's Twitter Post Plugin for #WordPress - http://leenk.me/ " . rand(10,99);
 			$result = twitterpost_tweet($un, $pw, $tweet);
 			
 			if (isset($result["response"]["code"])) {
@@ -610,7 +610,18 @@ if (!function_exists('str_ireplace')) {
 }
 
 function twitterpost_activation_notice() {
-	 echo '<div id="message" class="error fade"><p><strong>Attention Twitter Post Users</strong><br>Twitter will be shutting off an API used by many Twitter plugins. Please take <a href="http://fullthrottledevelopment.com/what-should-we-do-when-twitter-breaks-twitter-post">this short survey</a> so we can gauge how to best support your needs.</p></div>';
+	$kill = strtotime("2010-08-16");
+	$curr = strtotime( date( "Y-m-d", time() ) );
+	
+	if ( $curr < $kill ) {
+		$message = "On August 16th, 2010, Twitter will be shutting down their basic authentication API which Twitter Post uses.";
+	} else if ( $curr == $kill ) {
+		$message = "Today Twitter will be shutting down the basic authentication API that Twitter Post uses.";
+	} else {
+		$message = "On August 16th, 2010, Twitter shut down their basic authentication API that Twitter Post used.";
+	}
+
+	 echo '<div id="message" class="error fade"><p><strong>Attention Twitter Post Users</strong><br>' . $message . ' If you want to continue updating your Twitter account when you publish new posts, try the <a href="http://wordpress.org/extend/plugins/leenkme/">leenk.me plugin</a> which can also publish to your Facebook profile or page and is expanding to other social networks soon.</p></div>';
 }
 
 // Actions and filters	
@@ -623,7 +634,7 @@ if (isset($dl_pluginRFTwitterPost)) {
 	add_action('admin_menu', 'RF_TwitterPost_ap');
 	// Initialize options on plugin activation - NOT CURRENTLY NEEDED
 	// add_action("activate_rf-twitterpost/rf-twitterpost.php",  array(&$dl_pluginRFTwitterPost, 'init'));
-	// add_action('admin_notices', 'twitterpost_activation_notice');
+	add_action('admin_notices', 'twitterpost_activation_notice');
 	
 	add_action('edit_form_advanced', array($dl_pluginRFTwitterPost, 'twitterpost_add_meta_tags'), 1);
 	add_action('save_post', array($dl_pluginRFTwitterPost, 'twitterpost_meta_tags'));
