@@ -1,6 +1,6 @@
 === RF Twitter Post ===
 Contributors: layotte
-Tags: twitter, tweet, autopost, autotweet, automatic, social networking, social media, posts, twitter post, tinyurl, twitter friendly links, multiple authors, exclude post, category, categories, retweet, leenk.me, leenk, leenkme
+Tags: publish, automatic, facebook, twitter, linkedin, friendfeed, leenkme, leenk.me, social network, social media, social media tools
 Requires at least: 2.8
 Tested up to: 3.0
 Stable tag: 1.5.9
@@ -10,22 +10,15 @@ A simple plugin that will post to twitter whenever you add a new post to your wo
 == Description ==
 
 = ATTENTION TWITTER POST USERS =
-On August 16th, 2010, Twitter killed their basic authentication API which was used by Twitter Post. In anticipation of this, we created a new service called [leenk.me](http://leenk.me/). If you want to continue publishing to your Twitter account whenever you publish a new post in WordPress, we recommend using the [leenk.me WordPress plugin](http://wordpress.org/extend/plugins/leenkme/). RF Twitter Post will no longer work or be supported.
+On August 16th, 2010, Twitter killed their basic authentication API which was used by Twitter Post. In anticipation of this, we created a new service called [leenk.me](http://leenk.me/). If you want to continue publishing to your Twitter account whenever you publish a new post in WordPress, we recommend using the [leenk.me WordPress plugin](http://leenk.me/download/leenkme.zip). RF Twitter Post will no longer work or be supported.
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
-1. Upload `rf-twitterpost` directory to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Update Twitter Post Options with your twitter username, password, and the tweet format.
-4. Next time you publish a new post it will update twitter.
+On August 16th, 2010, Twitter killed their basic authentication API which was used by Twitter Post. In anticipation of this, we created a new service called [leenk.me](http://leenk.me/). If you want to continue publishing to your Twitter account whenever you publish a new post in WordPress, we recommend using the [leenk.me WordPress plugin](http://leenk.me/download/leenkme.zip). RF Twitter Post will no longer work or be supported.
 
 == Frequently Asked Questions ==
 
-= Where can I find help or make suggestions? =
-
-http://leenk.me/contact/
+On August 16th, 2010, Twitter killed their basic authentication API which was used by Twitter Post. In anticipation of this, we created a new service called [leenk.me](http://leenk.me/). If you want to continue publishing to your Twitter account whenever you publish a new post in WordPress, we recommend using the [leenk.me WordPress plugin](http://leenk.me/download/leenkme.zip). RF Twitter Post will no longer work or be supported.
 
 == Changelog ==
 = 1.5.9 =
